@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700;900&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-green: #8cd279;
+  --dark-bg: #171f14;
+  --border-green: #2f402b;
+  --card-bg: #222e1f;
+  --text-muted: #a4be9d;
+  --accent: #445c3d;
+  
+  --background: #171f14;
+  --foreground: #ffffff;
+}
+
+* {
+  transition: all 0.3s ease;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--foreground);
+  font-family: 'Manrope', 'Noto Sans', sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-green);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-green);
+}
+
+/* Button hover effects */
+.btn-primary {
+  @apply bg-primary-green text-carbon-dark font-bold py-3 px-6 rounded-full transition-all duration-300 hover:-translate-y-1 hover:shadow-carbon;
+}
+
+.btn-secondary {
+  @apply border border-carbon-border text-white font-medium py-2 px-4 rounded-lg transition-all duration-300 hover:bg-carbon-border hover:text-carbon-green;
+}
+
+/* Card hover effects */
+.card {
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-carbon-lg;
+}
+
+/* Form focus styles */
+input:focus, textarea:focus, select:focus {
+  @apply border-primary-green ring-2 ring-primary-green ring-opacity-20 outline-none;
+}
+
+/* Loading animation */
+.loading {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Active navigation state */
+.nav-active {
+  @apply text-primary-green font-semibold;
+}
+
+/* Success/Error message styles */
+.message {
+  @apply p-3 rounded-lg mb-4 animate-slide-up;
+}
+
+.message.success {
+  @apply bg-primary-green bg-opacity-10 border border-primary-green text-primary-green;
+}
+
+.message.error {
+  @apply bg-red-500 bg-opacity-10 border border-red-500 text-red-500;
+}
+
+/* Container utilities */
+.container-carbon {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Background patterns */
+.bg-grid-pattern {
+  background-image: radial-gradient(circle at 1px 1px, rgba(140, 210, 121, 0.1) 1px, transparent 0);
+  background-size: 20px 20px;
+}
+
+/* Chart container */
+.chart-container {
+  @apply relative h-96 w-full;
+}
+
+/* Page transitions */
+.page-transition {
+  @apply animate-fade-in;
+}
+
+/* Mobile responsive helpers */
+@media (max-width: 768px) {
+  .mobile-padding {
+    @apply px-4;
+  }
+  
+  .mobile-text {
+    @apply text-sm;
+  }
+}
