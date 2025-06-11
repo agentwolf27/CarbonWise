@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate CarbonWise Icons</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .icon-preview { margin: 10px; display: inline-block; }
+        canvas { border: 1px solid #ccc; margin: 5px; }
+        button { background: #22c55e; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>CarbonWise Extension Icon Generator</h1>
+    <p>Click the button below to generate and download placeholder icons:</p>
+    
+    <div class="icon-preview">
+        <h3>16x16</h3>
+        <canvas id="icon16" width="16" height="16"></canvas>
+    </div>
+    
+    <div class="icon-preview">
+        <h3>48x48</h3>
+        <canvas id="icon48" width="48" height="48"></canvas>
+    </div>
+    
+    <div class="icon-preview">
+        <h3>128x128</h3>
+        <canvas id="icon128" width="128" height="128"></canvas>
+    </div>
+    
+    <br><br>
+    <button onclick="generateIcons()">Generate & Download Icons</button>
+    
+    <script>
+        function drawIcon(canvas, size) {
+            const ctx = canvas.getContext('2d');
+            
+            // Create gradient background
+            const gradient = ctx.createLinearGradient(0, 0, size, size);
+            gradient.addColorStop(0, '#22c55e');
+            gradient.addColorStop(1, '#16a34a');
+            
+            // Fill background
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, size, size);
+            
+            // Draw leaf/carbon symbol
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            
+            if (size >= 48) {
+                // Detailed leaf for larger sizes
+                const centerX = size / 2;
+                const centerY = size / 2;
+                const leafSize = size * 0.6;
+                
+                // Draw leaf shape
+                ctx.ellipse(centerX, centerY - leafSize/6, leafSize/3, leafSize/2, 0, 0, 2 * Math.PI);
+                ctx.fill();
+                
+                // Draw stem
+                ctx.beginPath();
+                ctx.rect(centerX - 1, centerY + leafSize/4, 2, leafSize/4);
+                ctx.fill();
+            } else {
+                // Simple circle for small icon
+                const centerX = size / 2;
+                const centerY = size / 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, size * 0.3, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        }
+        
+        function generateIcons() {
+            const sizes = [16, 48, 128];
+            
+            sizes.forEach(size => {
+                const canvas = document.getElementById(`icon${size}`);
+                drawIcon(canvas, size);
+                
+                // Download the icon
+                const link = document.createElement('a');
+                link.download = `icon${size}.png`;
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+            
+            alert('Icons generated! Save them to chrome-extension/icons/ folder');
+        }
+        
+        // Generate previews on load
+        window.onload = function() {
+            drawIcon(document.getElementById('icon16'), 16);
+            drawIcon(document.getElementById('icon48'), 48);
+            drawIcon(document.getElementById('icon128'), 128);
+        };
+    </script>
+</body>
+</html> 

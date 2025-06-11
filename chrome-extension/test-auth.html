@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test CarbonWise Extension Auth</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #16a34a;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .success {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border-color: #ef4444;
+            color: #dc2626;
+        }
+        .info {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 CarbonWise Extension Test</h1>
+        <p>Use this page to test the Chrome extension authentication flow.</p>
+        
+        <div id="status" class="status info">
+            Ready to test extension authentication
+        </div>
+        
+        <div>
+            <button onclick="testExtensionAuth()">Test Extension Auth</button>
+            <button onclick="checkExtensionStorage()">Check Extension Storage</button>
+            <button onclick="clearExtensionStorage()">Clear Extension Storage</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        async function testExtensionAuth() {
+            const status = document.getElementById('status');
+            const results = document.getElementById('results');
+            
+            try {
+                status.className = 'status info';
+                status.textContent = 'Testing extension authentication...';
+                
+                // Simulate authentication data
+                const testData = {
+                    carbonwise_token: 'test_token_' + Date.now(),
+                    carbonwise_user: {
+                        id: 'test_user_123',
+                        name: 'Test User',
+                        email: 'test@example.com',
+                        accountType: 'INDIVIDUAL'
+                    }
+                };
+                
+                // Send message to extension
+                window.postMessage({
+                    type: 'CARBONWISE_AUTH_SUCCESS',
+                    data: testData
+                }, '*');
+                
+                status.className = 'status success';
+                status.textContent = 'Authentication message sent to extension!';
+                
+                // Check if extension responds
+                setTimeout(async () => {
+                    await checkExtensionStorage();
+                }, 1000);
+                
+            } catch (error) {
+                status.className = 'status error';
+                status.textContent = 'Error: ' + error.message;
+            }
+        }
+        
+        async function checkExtensionStorage() {
+            const results = document.getElementById('results');
+            
+            try {
+                if (typeof chrome === 'undefined' || !chrome.storage) {
+                    throw new Error('Chrome extension API not available');
+                }
+                
+                const data = await chrome.storage.local.get(['carbonwise_token', 'carbonwise_user']);
+                
+                results.innerHTML = `
+                    <h3>Extension Storage Contents:</h3>
+                    <pre style="background: #f8f9fa; padding: 15px; border-radius: 6px; overflow-x: auto;">
+${JSON.stringify(data, null, 2)}
+                    </pre>
+                `;
+                
+            } catch (error) {
+                results.innerHTML = `
+                    <div class="status error">
+                        Error checking extension storage: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        async function clearExtensionStorage() {
+            try {
+                if (typeof chrome === 'undefined' || !chrome.storage) {
+                    throw new Error('Chrome extension API not available');
+                }
+                
+                await chrome.storage.local.clear();
+                
+                const status = document.getElementById('status');
+                status.className = 'status success';
+                status.textContent = 'Extension storage cleared!';
+                
+                document.getElementById('results').innerHTML = '';
+                
+            } catch (error) {
+                const status = document.getElementById('status');
+                status.className = 'status error';
+                status.textContent = 'Error clearing storage: ' + error.message;
+            }
+        }
+        
+        // Listen for extension responses
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'CARBONWISE_EXTENSION_AUTH_COMPLETE') {
+                const status = document.getElementById('status');
+                
+                if (event.data.success) {
+                    status.className = 'status success';
+                    status.textContent = '✅ Extension authentication completed successfully!';
+                } else {
+                    status.className = 'status error';
+                    status.textContent = '❌ Extension authentication failed: ' + (event.data.error || 'Unknown error');
+                }
+            }
+        });
+        
+        // Show instructions on load
+        console.log(`
+🌱 CarbonWise Extension Test Instructions:
+
+1. Make sure the Chrome extension is loaded
+2. Click "Test Extension Auth" to simulate authentication
+3. Click "Check Extension Storage" to verify data was stored
+4. Check the browser console for extension logs
+
+Extension should be available at: chrome://extensions/
+        `);
+    </script>
+</body>
+</html> 

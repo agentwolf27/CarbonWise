@@ -1,19 +1,118 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from "next-auth/react";
 import { 
   BarChart3, TrendingUp, TrendingDown, Target, 
   Calendar, Award, Bell, Settings, Plus,
-  Leaf, Zap, Globe, Users, RefreshCw, AlertCircle
+  Leaf, Zap, Globe, Users, RefreshCw, AlertCircle, Chrome, X, Lightbulb
 } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import CarbonChart from '@/components/CarbonChart';
 import { useCarbonData } from '@/hooks/useCarbonData';
+import AddActivityModal from '@/components/AddActivityModal';
+
+const RecommendationCard = ({ recommendation }) => {
+  if (!recommendation) return null;
+  
+  return (
+    <div className="card bg-blue-500/10 border border-blue-500/20 rounded-xl p-6">
+      <div className="flex items-start gap-4">
+        <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Lightbulb size={24} className="text-blue-400" />
+        </div>
+        <div>
+          <h3 className="text-lg font-bold text-white mb-1">Quick Tip</h3>
+          <p className="text-blue-200/80 text-sm">{recommendation}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const AchievementsList = ({ achievements }) => {
+  if (!achievements || achievements.length === 0) {
+    return (
+      <div className="card bg-carbon-card border border-carbon-border rounded-xl p-6 text-center">
+        <p className="text-carbon-muted">Log your first activity to start earning achievements!</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="card bg-carbon-card border border-carbon-border rounded-xl p-6">
+      <h2 className="text-xl font-bold text-white mb-6">Achievements</h2>
+      <div className="space-y-4">
+        {achievements.map(achievement => (
+          <div key={achievement.id} className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-yellow-400/10 rounded-lg flex items-center justify-center">
+              <Award size={24} className="text-yellow-400" />
+            </div>
+            <div>
+              <h4 className="font-semibold text-white">{achievement.name}</h4>
+              <p className="text-sm text-carbon-muted">{achievement.description}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ChromeExtensionBanner = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="relative bg-gradient-to-r from-primary-green/20 to-green-900/20 border border-primary-green/30 rounded-xl p-6 mb-8 overflow-hidden">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 bg-primary-green/20 rounded-lg flex items-center justify-center">
+            <Chrome size={28} className="text-primary-green" />
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white">Get Automated Tracking</h3>
+            <p className="text-green-200/80 text-sm">
+              Install the CarbonWise Chrome extension for seamless, real-time carbon footprint tracking.
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <button className="btn-primary-outline text-sm">Learn More</button>
+          <button className="btn-primary text-sm">
+            <Chrome size={16} className="mr-2" />
+            Add to Chrome
+          </button>
+        </div>
+      </div>
+      <button 
+        onClick={() => setIsVisible(false)}
+        className="absolute top-3 right-3 text-green-200/50 hover:text-white transition-colors"
+        title="Dismiss"
+      >
+        <X size={20} />
+      </button>
+    </div>
+  );
+};
+
+const BusinessFeaturePlaceholder = () => (
+  <div className="card bg-carbon-card border-2 border-dashed border-carbon-border rounded-xl p-6 text-center">
+    <h3 className="text-lg font-bold text-white mb-2">Business Analytics Dashboard</h3>
+    <p className="text-carbon-muted text-sm">
+      This feature is available for business accounts. Track team progress, manage emissions, and generate reports.
+    </p>
+    <button className="btn-secondary mt-4 text-sm">Learn More</button>
+  </div>
+);
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [timeFrame, setTimeFrame] = useState('week');
   const { data, isLoading, error, refetch } = useCarbonData();
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getIconForActivityType = (type: string) => {
     switch (type) {
@@ -51,6 +150,22 @@ export default function DashboardPage() {
 
   const currentData = getCurrentData();
 
+  const getRecommendation = () => {
+    if (!data || !data.activities) return null;
+
+    const streamingActivities = data.activities.filter(a => a.type === 'Video Streaming').length;
+    if (streamingActivities > 2) {
+      return "You stream a lot of video. Consider watching in Standard Definition (SD) instead of High Definition (HD) to reduce emissions by up to 80%!";
+    }
+
+    return null;
+  };
+
+  const handleActivityAdded = () => {
+    // When an activity is added, refetch the data to update the dashboard
+    refetch();
+  };
+
   if (error) {
     return (
       <div className="page-transition">
@@ -83,7 +198,7 @@ export default function DashboardPage() {
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold text-white">
-                Welcome back, <span className="text-primary-green">Alex</span>
+                Welcome back, <span className="text-primary-green">{session?.user?.name || 'User'}</span>
               </h1>
               <p className="text-carbon-muted mt-2">
                 {isLoading ? (
@@ -114,7 +229,7 @@ export default function DashboardPage() {
               >
                 <RefreshCw size={20} className={isLoading ? 'animate-spin' : ''} />
               </button>
-              <button className="btn-primary">
+              <button onClick={() => setIsModalOpen(true)} className="btn-primary">
                 <Plus size={20} className="mr-2" />
                 Add Activity
               </button>
@@ -170,6 +285,7 @@ export default function DashboardPage() {
       {/* Main Dashboard Content */}
       <section className="py-8">
         <div className="container-carbon">
+          {session?.user?.accountType === 'INDIVIDUAL' && <ChromeExtensionBanner />}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Chart Area */}
             <div className="lg:col-span-2 space-y-8">
@@ -194,24 +310,15 @@ export default function DashboardPage() {
                 )}
               </div>
 
+              <RecommendationCard recommendation={getRecommendation()} />
+
               {/* Recent Activities */}
               <div className="card bg-carbon-card border border-carbon-border rounded-xl p-6">
                 <h2 className="text-xl font-bold text-white mb-6">Recent Activities</h2>
                 <div className="space-y-4">
-                  {isLoading ? (
-                    // Loading skeleton
-                    Array.from({ length: 3 }).map((_, index) => (
-                      <div key={index} className="flex items-center gap-4 p-4 bg-carbon-dark/50 rounded-lg">
-                        <div className="w-10 h-10 bg-carbon-border/50 rounded-lg animate-pulse"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="w-32 h-4 bg-carbon-border/50 rounded animate-pulse"></div>
-                          <div className="w-24 h-3 bg-carbon-border/30 rounded animate-pulse"></div>
-                        </div>
-                        <div className="w-16 h-4 bg-carbon-border/50 rounded animate-pulse"></div>
-                      </div>
-                    ))
-                  ) : data?.recentActivities ? (
-                    data.recentActivities.map((activity) => {
+                  {session?.user?.accountType === 'BUSINESS' && <BusinessFeaturePlaceholder />}
+                  {data?.activities && data.activities.length > 0 ? (
+                    data.activities.slice(0, 5).map((activity) => {
                       const Icon = getIconForActivityType(activity.type);
                       return (
                         <div key={activity.id} className="flex items-center gap-4 p-4 bg-carbon-dark/50 rounded-lg hover:bg-carbon-dark/70 transition-colors">
@@ -331,10 +438,19 @@ export default function DashboardPage() {
                   Offset Now
                 </button>
               </div>
+
+              {/* Achievements */}
+              <AchievementsList achievements={data?.achievements} />
             </div>
           </div>
         </div>
       </section>
+
+      <AddActivityModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onActivityAdded={handleActivityAdded}
+      />
 
       <Footer />
     </div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SessionWrapper from "@/components/SessionWrapper"
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -67,9 +68,11 @@ export default function RootLayout({
         <meta name="color-scheme" content="dark" />
       </head>
       <body className="min-h-screen bg-carbon-dark text-white antialiased">
-        <div className="relative flex min-h-screen flex-col">
-          {children}
-        </div>
+        <SessionWrapper>
+          <div className="relative flex min-h-screen flex-col">
+            {children}
+          </div>
+        </SessionWrapper>
       </body>
     </html>
   );

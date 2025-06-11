@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CarbonWise Tracker</title>
+  <style>
+    body {
+      width: 350px;
+      min-height: 400px;
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .status {
+      font-size: 12px;
+      opacity: 0.8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+    
+    .status-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ff6b6b;
+    }
+    
+    .status-indicator.connected {
+      background: #51cf66;
+    }
+    
+    .content {
+      padding: 20px;
+    }
+    
+    .auth-section {
+      text-align: center;
+    }
+    
+    .auth-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .auth-subtitle {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 20px;
+      line-height: 1.4;
+    }
+    
+    .btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      width: 100%;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    
+    .btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn.primary {
+      background: #51cf66;
+      border-color: #51cf66;
+    }
+    
+    .btn.primary:hover {
+      background: #40c057;
+    }
+    
+    .dashboard-section {
+      display: none;
+    }
+    
+    .dashboard-section.show {
+      display: block;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      opacity: 0.7;
+    }
+    
+    .tracking-sites {
+      margin-top: 20px;
+    }
+    
+    .tracking-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .site-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      font-size: 12px;
+    }
+    
+    .site-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 8px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .error {
+      background: #ff6b6b;
+      color: white;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">CarbonWise</div>
+    <div class="status">
+      <span class="status-indicator" id="statusIndicator"></span>
+      <span id="statusText">Checking...</span>
+    </div>
+  </div>
+  
+  <div class="content">
+    <!-- Loading State -->
+    <div id="loadingSection" class="loading">
+      <div>Loading...</div>
+    </div>
+    
+    <!-- Authentication Section -->
+    <div id="authSection" class="auth-section" style="display: none;">
+      <div class="auth-title">Connect to CarbonWise</div>
+      <div class="auth-subtitle">
+        Sign in to start automatic carbon tracking across your favorite websites.
+      </div>
+      <button id="signInBtn" class="btn primary">Sign In with Google</button>
+      <button id="permissionsBtn" class="btn" style="display: none;">Enable Tracking Permissions</button>
+      <div id="errorMessage" class="error" style="display: none;"></div>
+    </div>
+    
+    <!-- Dashboard Section -->
+    <div id="dashboardSection" class="dashboard-section">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="todayEmissions">0.0</div>
+          <div class="stat-label">kg CO₂ Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="monthEmissions">0.0</div>
+          <div class="stat-label">kg CO₂ This Month</div>
+        </div>
+      </div>
+      
+      <button id="manualEntryBtn" class="btn">Add Manual Entry</button>
+      <button id="viewDashboardBtn" class="btn">Open Full Dashboard</button>
+      <button id="signOutBtn" class="btn">Sign Out</button>
+      
+      <div class="tracking-sites">
+        <div class="tracking-title">Tracking Active On:</div>
+        <div class="site-list">
+          <div class="site-item">Amazon</div>
+          <div class="site-item">Booking.com</div>
+          <div class="site-item">Expedia</div>
+          <div class="site-item">Kayak</div>
+          <div class="site-item">Uber</div>
+          <div class="site-item">Lyft</div>
+          <div class="site-item">DoorDash</div>
+          <div class="site-item">Uber Eats</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html> 

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Play, BarChart3, Shield, Globe, Users, Zap, TrendingUp } from 'lucide-react';
+import { ArrowRight, Play, BarChart3, Shield, Globe, Users, Zap, TrendingUp, Building2, CheckCircle } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
@@ -98,16 +98,6 @@ export default function HomePage() {
                 title: 'Global Impact',
                 description: 'See how your actions contribute to global sustainability goals and environmental initiatives.'
               },
-              {
-                icon: Zap,
-                title: 'Easy Integration',
-                description: 'Connect with your existing tools and platforms through our comprehensive API and integrations.'
-              },
-              {
-                icon: Users,
-                title: 'Team Collaboration',
-                description: 'Work together with your team or organization to achieve collective sustainability goals.'
-              },
             ].map((feature, index) => (
               <div key={index} className="card bg-carbon-card border border-carbon-border rounded-xl p-6 space-y-4">
                 <div className="w-12 h-12 bg-primary-green/10 rounded-lg flex items-center justify-center">
@@ -117,6 +107,49 @@ export default function HomePage() {
                 <p className="text-carbon-muted leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* For Businesses Section */}
+      <section className="py-20 bg-carbon-card border-y border-carbon-border">
+        <div className="container-carbon">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="inline-block bg-primary-green/10 text-primary-green text-sm font-semibold px-4 py-2 rounded-full">
+                Coming Soon
+              </div>
+              <h2 className="text-3xl md:text-5xl font-bold text-white">
+                Powerful Tools for <span className="text-primary-green">Businesses</span>
+              </h2>
+              <p className="text-xl text-carbon-muted">
+                Empower your organization to track, manage, and reduce its carbon footprint with our upcoming suite of business-focused features.
+              </p>
+              <ul className="space-y-4 text-carbon-light">
+                <li className="flex items-start gap-3">
+                  <CheckCircle size={24} className="text-primary-green flex-shrink-0 mt-1" />
+                  <span><span className="font-semibold text-white">Team Dashboards:</span> Get a comprehensive overview of your company's total emissions.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle size={24} className="text-primary-green flex-shrink-0 mt-1" />
+                  <span><span className="font-semibold text-white">Employee Challenges:</span> Engage your workforce with fun, competitive sustainability goals.</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle size={24} className="text-primary-green flex-shrink-0 mt-1" />
+                  <span><span className="font-semibold text-white">Automated Reporting:</span> Generate compliance and sustainability reports with a single click.</span>
+                </li>
+              </ul>
+              <button className="btn-secondary text-lg mt-4">
+                Request Early Access
+              </button>
+            </div>
+            <div className="relative h-96">
+              <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>
+              <div className="absolute inset-0 bg-gradient-to-br from-primary-green/10 to-transparent rounded-2xl"></div>
+              <div className="p-8 h-full flex items-center justify-center">
+                 <Building2 size={128} className="text-primary-green opacity-20" />
+              </div>
+            </div>
           </div>
         </div>
       </section>

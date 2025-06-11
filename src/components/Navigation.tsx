@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { Menu, X, Leaf } from 'lucide-react';
+import { Menu, X, Leaf, LogOut, User } from 'lucide-react';
+import { useSession, signOut } from 'next-auth/react';
 
 const Navigation = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   const navItems = [
     { href: '/', label: 'Home' },
@@ -47,11 +49,36 @@ const Navigation = () => {
             ))}
           </nav>
 
-          {/* CTA Button */}
+          {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-4">
-            <Link href="/dashboard" className="btn-primary">
-              Get Started
-            </Link>
+            {status === 'loading' ? (
+              <div className="w-8 h-8 rounded-full bg-carbon-card animate-pulse"></div>
+            ) : session ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 text-white">
+                  <div className="w-8 h-8 rounded-full bg-primary-green/20 flex items-center justify-center">
+                    <User size={16} className="text-primary-green" />
+                  </div>
+                  <span className="text-sm">{session.user?.name}</span>
+                </div>
+                <button
+                  onClick={() => signOut()}
+                  className="flex items-center gap-2 text-sm text-carbon-muted hover:text-white transition-colors"
+                >
+                  <LogOut size={16} />
+                  Sign Out
+                </button>
+              </div>
+            ) : (
+              <>
+                <Link href="/auth/signin" className="text-sm text-white hover:text-primary-green transition-colors">
+                  Sign In
+                </Link>
+                <Link href="/auth/signup" className="btn-primary">
+                  Get Started
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -80,13 +107,46 @@ const Navigation = () => {
                   {item.label}
                 </Link>
               ))}
-              <Link 
-                href="/dashboard" 
-                className="btn-primary w-fit mt-2"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Get Started
-              </Link>
+              {/* Mobile Auth Buttons */}
+              {status === 'loading' ? (
+                <div className="w-8 h-8 rounded-full bg-carbon-card animate-pulse mt-2"></div>
+              ) : session ? (
+                <div className="pt-2 border-t border-carbon-border mt-2">
+                  <div className="flex items-center gap-2 text-white mb-3">
+                    <div className="w-8 h-8 rounded-full bg-primary-green/20 flex items-center justify-center">
+                      <User size={16} className="text-primary-green" />
+                    </div>
+                    <span className="text-sm">{session.user?.name}</span>
+                  </div>
+                  <button
+                    onClick={() => {
+                      signOut();
+                      setIsMenuOpen(false);
+                    }}
+                    className="flex items-center gap-2 text-sm text-carbon-muted hover:text-white transition-colors"
+                  >
+                    <LogOut size={16} />
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <div className="pt-2 border-t border-carbon-border mt-2 space-y-2">
+                  <Link 
+                    href="/auth/signin" 
+                    className="block text-sm text-white hover:text-primary-green transition-colors"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link 
+                    href="/auth/signup" 
+                    className="btn-primary w-fit"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              )}
             </nav>
           </div>
         )}

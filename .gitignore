@@ -52,3 +52,15 @@ logs
 # Cache
 .cache/
 .parcel-cache/
+
+# Database
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+/prisma/dev.db*
+/prisma/*.db
+/prisma/*.db-*
+
+# Generated files
+/src/generated/prisma

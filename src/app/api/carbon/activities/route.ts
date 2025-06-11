@@ -1,56 +1,155 @@
 import { NextResponse } from 'next/server';
 import type { NewCarbonActivity } from '@/types/carbon';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 // In a real app, this would be stored in a database
 let activities: any[] = [];
 
 export async function POST(request: Request) {
   try {
-    const body: NewCarbonActivity = await request.json();
+    // Check authentication - support both session and extension token
+    let userId = null;
     
-    // Validate required fields
-    if (!body.type || !body.category || !body.amount || !body.description) {
-      return NextResponse.json(
-        { success: false, error: 'Missing required fields' },
-        { status: 400 }
-      );
+    // First, try to get session (for web app)
+    const session = await getServerSession(authOptions);
+    if (session?.user?.id) {
+      userId = session.user.id;
+    } else {
+      // Try extension authentication
+      const authHeader = request.headers.get('authorization');
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        
+        // For now, we'll extract userId from the request body
+        // In production, you'd decode it from the JWT token
+        const body = await request.json();
+        
+        // Simple token validation - in production use proper JWT
+        if (token && body.userId) {
+          userId = body.userId;
+        }
+      }
     }
-
-    // Validate amount is positive
-    if (body.amount <= 0) {
-      return NextResponse.json(
-        { success: false, error: 'Amount must be positive' },
-        { status: 400 }
-      );
+    
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    // Create new activity
-    const newActivity = {
-      id: Date.now(), // In a real app, use proper ID generation
-      type: body.type,
-      category: body.category,
-      amount: body.amount,
-      timestamp: new Date(),
-      description: body.description,
-      location: body.location || 'Unknown',
-    };
-
-    // Add to activities (in a real app, save to database)
-    activities.push(newActivity);
-
-    return NextResponse.json({
-      success: true,
+    
+    const body = await request.json();
+    const {
+      type,
+      category,
+      amount,
+      description,
+      location,
+      metadata,
+      source = 'manual'
+    } = body;
+    
+    // Validation
+    if (!type || !category || amount === undefined || !description) {
+      return NextResponse.json({ 
+        error: "Missing required fields: type, category, amount, description" 
+      }, { status: 400 });
+    }
+    
+    if (typeof amount !== 'number' || amount < 0) {
+      return NextResponse.json({ 
+        error: "Amount must be a positive number" 
+      }, { status: 400 });
+    }
+    
+    // Create carbon activity
+    const activity = await prisma.carbonActivity.create({
       data: {
-        activity: newActivity,
-        message: 'Activity added successfully'
+        userId,
+        type,
+        category,
+        amount: parseFloat(amount),
+        description,
+        location: location || null,
+        metadata: typeof metadata === 'string' ? metadata : JSON.stringify(metadata || {}),
+        timestamp: new Date(),
       }
     });
+    
+    // Check for achievements
+    await checkAndAwardAchievements(userId);
+    
+    return NextResponse.json({
+      success: true,
+      activity: {
+        id: activity.id,
+        type: activity.type,
+        category: activity.category,
+        amount: activity.amount,
+        description: activity.description,
+        timestamp: activity.timestamp
+      }
+    });
+    
   } catch (error) {
-    console.error('Error adding carbon activity:', error);
+    console.error('Failed to create carbon activity:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to add activity' },
+      { success: false, error: 'Failed to create activity' },
       { status: 500 }
     );
+  }
+}
+
+async function checkAndAwardAchievements(userId: string) {
+  try {
+    // Get user's activity count
+    const activityCount = await prisma.carbonActivity.count({
+      where: { userId }
+    });
+    
+    // Award "First Activity" achievement
+    if (activityCount === 1) {
+      await prisma.achievement.upsert({
+        where: {
+          userId_type: {
+            userId,
+            type: 'FIRST_ACTIVITY'
+          }
+        },
+        update: {},
+        create: {
+          userId,
+          type: 'FIRST_ACTIVITY',
+          name: 'First Steps',
+          description: 'Tracked your first carbon activity',
+        }
+      });
+    }
+    
+    // Award milestone achievements
+    const milestones = [10, 50, 100, 500];
+    for (const milestone of milestones) {
+      if (activityCount === milestone) {
+        await prisma.achievement.upsert({
+          where: {
+            userId_type: {
+              userId,
+              type: `ACTIVITIES_${milestone}`
+            }
+          },
+          update: {},
+          create: {
+            userId,
+            type: `ACTIVITIES_${milestone}`,
+            name: `${milestone} Activities`,
+            description: `Tracked ${milestone} carbon activities`,
+          }
+        });
+      }
+    }
+    
+  } catch (error) {
+    console.error('Failed to check achievements:', error);
+    // Don't throw error as this is not critical
   }
 }
 

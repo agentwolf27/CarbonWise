@@ -1,24 +1,48 @@
 # CarbonWise - AI-Driven Carbon Footprint Tracking
 
-A modern, responsive web application built with **Next.js 15**, **TypeScript**, and **Tailwind CSS** for tracking and reducing digital carbon footprints.
+A modern, responsive web application built with **Next.js 15**, **TypeScript**, **Tailwind CSS**, and **Prisma** for tracking and reducing your carbon footprint with automated Chrome extension tracking.
+
+## 🌐 Live Website
+
+**🚧 Live Website Coming Soon! 🚧**
+
+We're currently working on deploying CarbonWise to production. The live website will be available at [carbonwise.com](https://carbonwise.com) soon. In the meantime, you can run the project locally using the installation instructions below.
+
+**Current Status**: ✅ Development Complete | 🔄 Deployment In Progress
 
 ## 🌱 Features
 
-- **Real-time Carbon Tracking** - Monitor your digital carbon footprint across all activities
-- **AI-Powered Insights** - Get personalized recommendations based on machine learning
-- **Interactive Dashboard** - Comprehensive analytics and data visualization
-- **Goal Setting & Progress Tracking** - Set sustainability goals and track achievements
-- **Team Collaboration** - Work together to achieve collective sustainability goals
-- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+### ✅ Implemented Features
+- **🔐 User Authentication** - Secure login with Google OAuth and NextAuth.js
+- **📊 Personal Dashboard** - Real-time carbon tracking with interactive analytics
+- **📈 Manual Activity Logging** - Add carbon activities like travel, food, energy consumption
+- **🎯 Goal Setting & Progress Tracking** - Set sustainability goals and track achievements
+- **🏆 Achievement System** - Unlock badges for reaching sustainability milestones
+- **👥 Account Types** - Individual and Business account support
+- **🔌 Chrome Extension** - Automated carbon tracking for online activities
+- **🛍️ E-commerce Tracking** - Amazon purchases automatically tracked
+- **🏨 Travel Tracking** - Hotel bookings (Booking.com, Expedia, Kayak)
+- **🚗 Transportation Tracking** - Uber/Lyft rides automatically detected
+- **🍕 Food Delivery Tracking** - DoorDash, Uber Eats, Grubhub orders
+- **📱 Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **💾 SQLite Database** - Reliable local database with Prisma ORM
+
+### 🔄 In Development
+- **✈️ Flight Tracking** - Enhanced flight carbon calculations
+- **🏢 Business Team Management** - Company dashboards and team features
+- **🤖 AI-Powered Insights** - Personalized sustainability recommendations
+- **📧 Email Notifications** - Progress updates and achievement notifications
 
 ## 🚀 Tech Stack
 
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript
+- **Database**: SQLite with Prisma ORM
+- **Authentication**: NextAuth.js with Google OAuth
 - **Styling**: Tailwind CSS with custom design system
+- **Chrome Extension**: Manifest V3 with background service workers
 - **Icons**: Lucide React
-- **Animations**: CSS animations and transitions
-- **Deployment**: Ready for Vercel/Netlify
+- **Deployment**: Ready for Vercel deployment
 
 ## 📦 Installation
 
@@ -145,12 +169,28 @@ Custom configuration in `tailwind.config.ts` includes:
 
 ## 🌍 Environment Variables
 
-Create a `.env.local` file for environment variables:
+⚠️ **Security Notice**: Never commit API keys or secrets to the repository!
 
-```env
-NEXT_PUBLIC_API_URL=your_api_url
-NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
-```
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Fill in your actual credentials in `.env.local`:
+   ```env
+   DATABASE_URL="file:./prisma/dev.db"
+   NEXTAUTH_SECRET="your-secure-random-string"
+   NEXTAUTH_URL="http://localhost:3000"
+   GOOGLE_CLIENT_ID="your-google-oauth-client-id"
+   GOOGLE_CLIENT_SECRET="your-google-oauth-client-secret"
+   ```
+
+3. Generate a secure NextAuth secret:
+   ```bash
+   openssl rand -base64 32
+   ```
+
+See `SECURITY.md` for complete security setup instructions.
 
 ## 🎨 Customization
 
@@ -219,3 +259,24 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **CarbonWise** - Making sustainability accessible through technology 🌱
+
+## 🏗️ Architecture
+
+### Web Application
+- **Frontend**: Next.js 15 with React and TypeScript
+- **Backend**: Next.js API Routes
+- **Database**: SQLite with Prisma ORM
+- **Authentication**: NextAuth.js with JWT tokens
+
+### Chrome Extension
+- **Manifest**: V3 for modern Chrome extension standards
+- **Background**: Service worker for API communication
+- **Content Scripts**: Automatic activity detection on supported websites
+- **Popup**: Modern React-like interface for user interaction
+- **Security**: Secure OAuth flow with JWT token management
+
+### Supported Websites for Auto-Tracking
+- **E-commerce**: Amazon
+- **Travel**: Booking.com, Expedia, Kayak
+- **Transportation**: Uber, Lyft
+- **Food Delivery**: DoorDash, Uber Eats, Grubhub
