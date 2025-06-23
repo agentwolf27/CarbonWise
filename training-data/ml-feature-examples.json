@@ -1,0 +1,24 @@
+[
+  {
+    "domain": "amazon.com",
+    "url_contains_product": true,
+    "page_title_words": [
+      "echo",
+      "dot",
+      "alexa"
+    ],
+    "time_on_page_seconds": 180,
+    "scroll_percentage": 75,
+    "hour_of_day": 14,
+    "day_of_week": 2,
+    "is_weekend": false,
+    "user_location_lat": 37.7749,
+    "user_location_lng": -122.4194,
+    "price_extracted": 49.99,
+    "category_detected": "electronics",
+    "shipping_option": "prime",
+    "predicted_carbon": 1.2,
+    "activity_type": "SHOPPING",
+    "confidence_score": 0.85
+  }
+]

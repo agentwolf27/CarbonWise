@@ -1,0 +1,92 @@
+[
+  {
+    "device_type": "laptop_intel_i5",
+    "category": "laptop",
+    "idle_watts": 8,
+    "browsing_watts": 25,
+    "streaming_watts": 35,
+    "gaming_watts": 65,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "laptop_m1_macbook",
+    "category": "laptop",
+    "idle_watts": 6,
+    "browsing_watts": 18,
+    "streaming_watts": 28,
+    "gaming_watts": 45,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "laptop_gaming",
+    "category": "laptop",
+    "idle_watts": 15,
+    "browsing_watts": 45,
+    "streaming_watts": 75,
+    "gaming_watts": 150,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "desktop_office",
+    "category": "desktop",
+    "idle_watts": 50,
+    "browsing_watts": 120,
+    "streaming_watts": 180,
+    "gaming_watts": 300,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "desktop_gaming",
+    "category": "desktop",
+    "idle_watts": 80,
+    "browsing_watts": 200,
+    "streaming_watts": 350,
+    "gaming_watts": 650,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "smartphone_android",
+    "category": "mobile",
+    "idle_watts": 0.5,
+    "browsing_watts": 2.5,
+    "streaming_watts": 4,
+    "gaming_watts": 6.5,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "smartphone_iphone",
+    "category": "mobile",
+    "idle_watts": 0.4,
+    "browsing_watts": 2,
+    "streaming_watts": 3.5,
+    "gaming_watts": 5.8,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "tablet_ipad",
+    "category": "tablet",
+    "idle_watts": 2,
+    "browsing_watts": 8,
+    "streaming_watts": 12,
+    "gaming_watts": 18,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "smart_tv_55inch",
+    "category": "tv",
+    "idle_watts": 25,
+    "browsing_watts": 120,
+    "streaming_watts": 150,
+    "gaming_watts": 180,
+    "co2_factor": 0.709
+  },
+  {
+    "device_type": "smart_tv_75inch",
+    "category": "tv",
+    "idle_watts": 40,
+    "browsing_watts": 180,
+    "streaming_watts": 220,
+    "gaming_watts": 280,
+    "co2_factor": 0.709
+  }
+]

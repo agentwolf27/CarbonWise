@@ -64,6 +64,7 @@ async function handleDirectAuth(userId: string) {
   const accessToken = jwt.sign(
     { 
       userId: user.id,
+      extensionId: 'web_direct_connection',
       type: 'extension_access',
       source: 'direct_auth'
     },

@@ -1,0 +1,372 @@
+[
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 245.4982992017139,
+    "shipping_distance_km": 39.93161017687596,
+    "shipping_type": "standard",
+    "carbon_kg": 1.4010341077259396,
+    "confidence": 0.8246701952166
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 327.76991994386253,
+    "shipping_distance_km": 37.06555490397954,
+    "shipping_type": "standard",
+    "carbon_kg": 0.9789152841074586,
+    "confidence": 0.7885921582550028
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 350.6641744841824,
+    "shipping_distance_km": 52.01802331169685,
+    "shipping_type": "standard",
+    "carbon_kg": 1.4235806218029614,
+    "confidence": 0.7984380446182511
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 264.1549455495036,
+    "shipping_distance_km": 45.584870836743576,
+    "shipping_type": "standard",
+    "carbon_kg": 1.3058857661264969,
+    "confidence": 0.769383635891313
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 288.9021728078753,
+    "shipping_distance_km": 62.20547470932697,
+    "shipping_type": "standard",
+    "carbon_kg": 0.9719660461542682,
+    "confidence": 0.8003987568489884
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 45.5888298418879,
+    "shipping_distance_km": 87.70431642159897,
+    "shipping_type": "express",
+    "carbon_kg": 0.8231408962059691,
+    "confidence": 0.7665052642987225
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 57.1600412717934,
+    "shipping_distance_km": 136.8365951507243,
+    "shipping_type": "express",
+    "carbon_kg": 0.7544587466256845,
+    "confidence": 0.7235000472864173
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 48.232739826058584,
+    "shipping_distance_km": 104.39493553492977,
+    "shipping_type": "express",
+    "carbon_kg": 0.9478373367371677,
+    "confidence": 0.7695443142787329
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 48.12848540759053,
+    "shipping_distance_km": 74.4598243497969,
+    "shipping_type": "express",
+    "carbon_kg": 0.646086514355653,
+    "confidence": 0.740394701771467
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 52.649344143993076,
+    "shipping_distance_km": 129.82971887503462,
+    "shipping_type": "express",
+    "carbon_kg": 0.8292457188965079,
+    "confidence": 0.7593108954635502
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 73.65407438269081,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.3552873617323087,
+    "confidence": 0.8963535154576239
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 85.34836305898949,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.2639413387597721,
+    "confidence": 0.8649797055776871
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 74.51578960677418,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.3251000690922243,
+    "confidence": 0.8394796436068717
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 99.73069897492016,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.2643659046441792,
+    "confidence": 0.870379411868215
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 95.77299866980891,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.2574293853182993,
+    "confidence": 0.8661151817014673
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 13.964325069533142,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.019425417118343634,
+    "confidence": 0.8228764321773951
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 16.906656504465136,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.02080784796203068,
+    "confidence": 0.7794179513460223
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 10.947705494333855,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.021168131597014955,
+    "confidence": 0.7917432555316744
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 17.47555858505625,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.014927967354095975,
+    "confidence": 0.7916661231659755
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 14.379229733626984,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.01873642785770755,
+    "confidence": 0.7684354209158268
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 2.0971271974506767,
+    "confidence": 0.7437782551924121
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 2.4290560069899287,
+    "confidence": 0.7366715657073519
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 1.8944159355558539,
+    "confidence": 0.6845350536746742
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 2.4849592360594466,
+    "confidence": 0.7433750352611115
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 2.4377321270871835,
+    "confidence": 0.7405298067303682
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.4388697915851183,
+    "confidence": 0.7711002326792731
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.45575879607425807,
+    "confidence": 0.7483671391181833
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.45696026510158455,
+    "confidence": 0.7367355318520729
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.4479870631105278,
+    "confidence": 0.7747832807159587
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.41952356313969974,
+    "confidence": 0.7601703900461338
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 18.354716384228293,
+    "confidence": 0.6903997108244745
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 13.997272396609118,
+    "confidence": 0.6833988617876695
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 17.57440116451092,
+    "confidence": 0.6942318186758526
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 16.680308058017417,
+    "confidence": 0.6753017034646551
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 16.111365164192605,
+    "confidence": 0.6773275235567364
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 90.1132797231645,
+    "confidence": 0.8603689344999834
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 76.48567464079292,
+    "confidence": 0.8832822801621105
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 87.93364888620113,
+    "confidence": 0.8632894946188059
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 73.26855472346894,
+    "confidence": 0.9263199984707418
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 87.55640739105311,
+    "confidence": 0.9297871187145181
+  }
+]

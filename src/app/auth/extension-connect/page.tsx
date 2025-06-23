@@ -22,12 +22,27 @@ export default function ExtensionConnectPage() {
       try {
         setStatus('Connecting extension...');
         
-        // Create extension token (simplified - in production use proper JWT)
-        const extensionToken = `ext_${session.user.id}_${Date.now()}`;
+        // Generate proper JWT token using the extension OAuth API
+        const response = await fetch('/api/auth/extension-oauth', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            directAuth: true,
+            userId: session.user.id
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to generate extension token: ${response.status}`);
+        }
+
+        const tokenData = await response.json();
         
         // Send data to extension
         const extensionData = {
-          carbonwise_token: extensionToken,
+          carbonwise_token: tokenData.accessToken,
           carbonwise_user: {
             id: session.user.id,
             name: session.user.name,

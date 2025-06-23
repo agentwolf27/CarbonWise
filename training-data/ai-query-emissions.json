@@ -1,0 +1,98 @@
+[
+  {
+    "service": "openai_gpt4",
+    "category": "text_generation",
+    "energy_per_1k_tokens_wh": 2.9,
+    "co2_per_1k_tokens_g": 1.4,
+    "cost_per_1k_tokens": 0.03,
+    "provider": "OpenAI"
+  },
+  {
+    "service": "openai_gpt35",
+    "category": "text_generation",
+    "energy_per_1k_tokens_wh": 0.8,
+    "co2_per_1k_tokens_g": 0.4,
+    "cost_per_1k_tokens": 0.002,
+    "provider": "OpenAI"
+  },
+  {
+    "service": "claude_opus",
+    "category": "text_generation",
+    "energy_per_1k_tokens_wh": 2.1,
+    "co2_per_1k_tokens_g": 1.1,
+    "cost_per_1k_tokens": 0.015,
+    "provider": "Anthropic"
+  },
+  {
+    "service": "claude_sonnet",
+    "category": "text_generation",
+    "energy_per_1k_tokens_wh": 1.2,
+    "co2_per_1k_tokens_g": 0.6,
+    "cost_per_1k_tokens": 0.003,
+    "provider": "Anthropic"
+  },
+  {
+    "service": "google_palm",
+    "category": "text_generation",
+    "energy_per_1k_tokens_wh": 1.8,
+    "co2_per_1k_tokens_g": 0.9,
+    "cost_per_1k_tokens": 0.0005,
+    "provider": "Google"
+  },
+  {
+    "service": "dalle_3",
+    "category": "image_generation",
+    "energy_per_image_wh": 45.2,
+    "co2_per_image_g": 28.1,
+    "cost_per_image": 0.04,
+    "provider": "OpenAI"
+  },
+  {
+    "service": "midjourney",
+    "category": "image_generation",
+    "energy_per_image_wh": 38.7,
+    "co2_per_image_g": 24.3,
+    "cost_per_image": 0.025,
+    "provider": "Midjourney"
+  },
+  {
+    "service": "stable_diffusion",
+    "category": "image_generation",
+    "energy_per_image_wh": 12.4,
+    "co2_per_image_g": 7.8,
+    "cost_per_image": 0.002,
+    "provider": "Stability"
+  },
+  {
+    "service": "github_copilot",
+    "category": "code_generation",
+    "energy_per_suggestion_wh": 0.8,
+    "co2_per_suggestion_g": 0.5,
+    "cost_per_suggestion": 0.0002,
+    "provider": "GitHub"
+  },
+  {
+    "service": "cursor_ai",
+    "category": "code_generation",
+    "energy_per_suggestion_wh": 0.6,
+    "co2_per_suggestion_g": 0.4,
+    "cost_per_suggestion": 0.0001,
+    "provider": "Cursor"
+  },
+  {
+    "service": "openai_embeddings",
+    "category": "embeddings",
+    "energy_per_1k_tokens_wh": 0.1,
+    "co2_per_1k_tokens_g": 0.06,
+    "cost_per_1k_tokens": 0.0001,
+    "provider": "OpenAI"
+  },
+  {
+    "service": "google_search_api",
+    "category": "search",
+    "energy_per_query_wh": 0.3,
+    "co2_per_query_g": 0.2,
+    "cost_per_query": 0.005,
+    "provider": "Google"
+  }
+]

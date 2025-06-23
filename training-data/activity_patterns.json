@@ -1,0 +1,58 @@
+[
+  {
+    "url_pattern": {},
+    "activity_type": "SHOPPING",
+    "category": "E_COMMERCE",
+    "extraction_rules": {
+      "product_title": "span#productTitle",
+      "price": ".a-price-whole",
+      "product_category": "nav .a-breadcrumb",
+      "shipping_option": "[data-csa-c-delivery-option]"
+    },
+    "carbon_calculation": "ecommerce_with_shipping"
+  },
+  {
+    "url_pattern": {},
+    "activity_type": "STREAMING",
+    "category": "ENTERTAINMENT",
+    "extraction_rules": {
+      "title": ".video-title",
+      "duration": ".duration-text",
+      "quality": "[data-uia=\"video-quality\"]"
+    },
+    "carbon_calculation": "streaming_by_quality_duration"
+  },
+  {
+    "url_pattern": {},
+    "activity_type": "STREAMING",
+    "category": "ENTERTAINMENT",
+    "extraction_rules": {
+      "title": "h1.title",
+      "duration": ".ytp-time-duration",
+      "quality": ".ytp-settings-menu"
+    },
+    "carbon_calculation": "streaming_by_quality_duration"
+  },
+  {
+    "url_pattern": {},
+    "activity_type": "TRAVEL",
+    "category": "ACCOMMODATION",
+    "extraction_rules": {
+      "location": "[data-testid=\"header-location\"]",
+      "dates": ".c-reservation-dates",
+      "room_type": ".hprt-table"
+    },
+    "carbon_calculation": "hotel_stay_by_location_nights"
+  },
+  {
+    "url_pattern": {},
+    "activity_type": "FOOD_DELIVERY",
+    "category": "FOOD",
+    "extraction_rules": {
+      "restaurant": ".store-header h1",
+      "items": ".order-item",
+      "delivery_distance": ".delivery-time"
+    },
+    "carbon_calculation": "food_delivery_by_distance_items"
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "platform": "youtube",
+    "quality": "480p",
+    "bitrate_kbps": 1000,
+    "co2_per_hour_g": 36,
+    "energy_per_hour_wh": 22.8,
+    "device_factor": 1
+  },
+  {
+    "platform": "youtube",
+    "quality": "720p",
+    "bitrate_kbps": 2500,
+    "co2_per_hour_g": 72,
+    "energy_per_hour_wh": 45.6,
+    "device_factor": 1.2
+  },
+  {
+    "platform": "youtube",
+    "quality": "1080p",
+    "bitrate_kbps": 5000,
+    "co2_per_hour_g": 162,
+    "energy_per_hour_wh": 103,
+    "device_factor": 1.5
+  },
+  {
+    "platform": "youtube",
+    "quality": "4K",
+    "bitrate_kbps": 25000,
+    "co2_per_hour_g": 692,
+    "energy_per_hour_wh": 440,
+    "device_factor": 2
+  },
+  {
+    "platform": "netflix",
+    "quality": "SD",
+    "bitrate_kbps": 1000,
+    "co2_per_hour_g": 36,
+    "energy_per_hour_wh": 22.8,
+    "device_factor": 1
+  },
+  {
+    "platform": "netflix",
+    "quality": "HD",
+    "bitrate_kbps": 3000,
+    "co2_per_hour_g": 90,
+    "energy_per_hour_wh": 57,
+    "device_factor": 1.3
+  },
+  {
+    "platform": "netflix",
+    "quality": "4K",
+    "bitrate_kbps": 15000,
+    "co2_per_hour_g": 415,
+    "energy_per_hour_wh": 264,
+    "device_factor": 1.8
+  },
+  {
+    "platform": "twitch",
+    "quality": "720p",
+    "bitrate_kbps": 4500,
+    "co2_per_hour_g": 144,
+    "energy_per_hour_wh": 91.2,
+    "device_factor": 1.4
+  },
+  {
+    "platform": "twitch",
+    "quality": "1080p",
+    "bitrate_kbps": 6000,
+    "co2_per_hour_g": 194,
+    "energy_per_hour_wh": 123,
+    "device_factor": 1.6
+  },
+  {
+    "platform": "spotify",
+    "quality": "normal",
+    "bitrate_kbps": 160,
+    "co2_per_hour_g": 7.2,
+    "energy_per_hour_wh": 4.6,
+    "device_factor": 0.5
+  },
+  {
+    "platform": "spotify",
+    "quality": "high",
+    "bitrate_kbps": 320,
+    "co2_per_hour_g": 14.4,
+    "energy_per_hour_wh": 9.1,
+    "device_factor": 0.6
+  },
+  {
+    "platform": "apple_music",
+    "quality": "lossless",
+    "bitrate_kbps": 1000,
+    "co2_per_hour_g": 36,
+    "energy_per_hour_wh": 22.8,
+    "device_factor": 0.7
+  }
+]

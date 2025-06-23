@@ -1,0 +1,76 @@
+[
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "electronics",
+    "price_usd": 299.99,
+    "shipping_distance_km": 50,
+    "shipping_type": "standard",
+    "carbon_kg": 1.2,
+    "confidence": 0.85
+  },
+  {
+    "activity_type": "SHOPPING",
+    "website": "amazon.com",
+    "product_category": "clothing",
+    "price_usd": 49.99,
+    "shipping_distance_km": 100,
+    "shipping_type": "express",
+    "carbon_kg": 0.8,
+    "confidence": 0.8
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "netflix.com",
+    "duration_minutes": 90,
+    "video_quality": "4K",
+    "device_type": "TV",
+    "carbon_kg": 0.32,
+    "confidence": 0.9
+  },
+  {
+    "activity_type": "STREAMING",
+    "website": "youtube.com",
+    "duration_minutes": 15,
+    "video_quality": "HD",
+    "device_type": "mobile",
+    "carbon_kg": 0.018,
+    "confidence": 0.85
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "doordash.com",
+    "restaurant_distance_km": 5,
+    "food_type": "burger",
+    "delivery_vehicle": "car",
+    "carbon_kg": 2.1,
+    "confidence": 0.75
+  },
+  {
+    "activity_type": "FOOD_DELIVERY",
+    "website": "ubereats.com",
+    "restaurant_distance_km": 2,
+    "food_type": "salad",
+    "delivery_vehicle": "bike",
+    "carbon_kg": 0.4,
+    "confidence": 0.8
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "booking.com",
+    "travel_type": "hotel",
+    "nights": 3,
+    "location": "urban",
+    "carbon_kg": 15.6,
+    "confidence": 0.7
+  },
+  {
+    "activity_type": "TRAVEL",
+    "website": "expedia.com",
+    "travel_type": "flight",
+    "distance_km": 500,
+    "passengers": 1,
+    "carbon_kg": 85,
+    "confidence": 0.95
+  }
+]

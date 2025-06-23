@@ -1,0 +1,67 @@
+[
+  {
+    "provider": "google",
+    "service": "search",
+    "co2_per_gb": 0.18,
+    "renewable_percentage": 100,
+    "location": "global"
+  },
+  {
+    "provider": "microsoft",
+    "service": "azure",
+    "co2_per_gb": 0.25,
+    "renewable_percentage": 85,
+    "location": "global"
+  },
+  {
+    "provider": "amazon",
+    "service": "aws",
+    "co2_per_gb": 0.35,
+    "renewable_percentage": 65,
+    "location": "global"
+  },
+  {
+    "provider": "meta",
+    "service": "facebook",
+    "co2_per_gb": 0.22,
+    "renewable_percentage": 75,
+    "location": "global"
+  },
+  {
+    "provider": "netflix",
+    "service": "cdn",
+    "co2_per_gb": 0.15,
+    "renewable_percentage": 90,
+    "location": "global"
+  },
+  {
+    "type": "fiber_optic",
+    "co2_per_gb": 0.05,
+    "energy_per_gb_kwh": 0.07,
+    "coverage": "urban"
+  },
+  {
+    "type": "cable_broadband",
+    "co2_per_gb": 0.12,
+    "energy_per_gb_kwh": 0.17,
+    "coverage": "suburban"
+  },
+  {
+    "type": "4g_cellular",
+    "co2_per_gb": 0.18,
+    "energy_per_gb_kwh": 0.25,
+    "coverage": "mobile"
+  },
+  {
+    "type": "5g_cellular",
+    "co2_per_gb": 0.08,
+    "energy_per_gb_kwh": 0.11,
+    "coverage": "mobile"
+  },
+  {
+    "type": "satellite",
+    "co2_per_gb": 0.45,
+    "energy_per_gb_kwh": 0.63,
+    "coverage": "rural"
+  }
+]

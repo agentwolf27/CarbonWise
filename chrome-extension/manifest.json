@@ -7,10 +7,11 @@
     "storage",
     "identity",
     "activeTab",
-    "scripting"
+    "scripting",
+    "notifications"
   ],
   "oauth2": {
-    "client_id": "YOUR_GOOGLE_CLIENT_ID_HERE",
+    "client_id": "113243607151-f8cbt4ror4v1uqtdftf41pq6uvko9so4.apps.googleusercontent.com",
     "scopes": ["email", "profile"]
   },
   "host_permissions": [
@@ -32,8 +33,14 @@
     "*://*.ubereats.com/*",
     "*://grubhub.com/*",
     "*://*.grubhub.com/*",
-    "*://localhost:3000/*",
-    "*://localhost:3001/*"
+    "*://chat.openai.com/*",
+    "*://claude.ai/*",
+    "*://youtube.com/*",
+    "*://*.youtube.com/*",
+    "*://netflix.com/*",
+    "*://*.netflix.com/*",
+    "http://localhost:3000/*",
+    "http://localhost:3001/*"
   ],
   "background": {
     "service_worker": "background.js"
@@ -61,18 +68,25 @@
         "*://ubereats.com/*",
         "*://*.ubereats.com/*",
         "*://grubhub.com/*",
-        "*://*.grubhub.com/*"
+        "*://*.grubhub.com/*",
+        "*://chat.openai.com/*",
+        "*://claude.ai/*",
+        "*://youtube.com/*",
+        "*://*.youtube.com/*",
+        "*://netflix.com/*",
+        "*://*.netflix.com/*"
       ],
       "js": ["content.js"],
       "run_at": "document_idle"
     },
     {
       "matches": [
-        "*://localhost:3000/auth/extension-connect*",
-        "*://localhost:3001/auth/extension-connect*"
+        "http://localhost:3000/auth/extension-connect*",
+        "http://localhost:3001/auth/extension-connect*"
       ],
       "js": ["auth-listener.js"],
-      "run_at": "document_idle"
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "action": {

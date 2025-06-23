@@ -1,6 +1,6 @@
 // Background service worker for CarbonWise Chrome Extension
 
-const API_BASE_URL = 'http://localhost:3000';
+const API_BASE_URL = 'http://localhost:3001';
 
 // Authentication state
 let isAuthenticated = false;
@@ -23,19 +23,37 @@ async function checkAuthStatus() {
       currentUser = result.carbonwise_user;
       
       // Verify token with the server
+      console.log('🔐 Verifying token with server...', {
+        userId: currentUser.id,
+        extensionId: chrome.runtime.id,
+        hasToken: !!userToken
+      });
+      
       const response = await fetch(`${API_BASE_URL}/api/auth/verify-extension`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${userToken}`
-        }
+        },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          extensionId: chrome.runtime.id
+        })
       });
       
       if (response.ok) {
+        const result = await response.json();
+        console.log('✅ Token verification successful:', result);
         isAuthenticated = true;
         chrome.action.setBadgeText({ text: '✓' });
         chrome.action.setBadgeBackgroundColor({ color: '#22c55e' });
       } else {
+        const errorText = await response.text();
+        console.error('❌ Token verification failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorText
+        });
         // Token invalid, clear storage
         await chrome.storage.local.clear();
         isAuthenticated = false;
@@ -134,16 +152,23 @@ async function trackCarbonActivity(activity) {
   }
   
   try {
-    const response = await fetch(`${API_BASE_URL}/api/carbon/activities`, {
+    // Use AI-enhanced carbon calculation
+    const response = await fetch(`${API_BASE_URL}/api/carbon/ai-enhanced`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${userToken}`
       },
       body: JSON.stringify({
-        ...activity,
-        timestamp: activity.timestamp || new Date().toISOString(),
-        source: 'extension'
+        url: activity.url || window.location?.href || 'unknown',
+        timeOnPage: activity.timeOnPage || 60,
+        pageTitle: activity.pageTitle || activity.description || 'Extension Activity',
+        scrollDepth: activity.scrollDepth || 0,
+        clickCount: activity.clickCount || 0,
+        deviceType: activity.deviceType || 'laptop',
+        networkType: activity.networkType || 'wifi',
+        userAgent: activity.userAgent || 'Chrome Extension',
+        location: activity.location || { lat: 0, lng: 0, country: 'US' }
       })
     });
     
@@ -230,6 +255,13 @@ async function handleWebAuthSuccess(authData) {
     console.error('❌ Failed to store web auth data:', error);
     throw error;
   }
+}
+
+// Helper function to detect device type (simplified for service worker)
+function getDeviceType() {
+  // Service workers don't have access to navigator.userAgent
+  // Default to laptop since most Chrome users are on desktop
+  return 'laptop';
 }
 
 // Periodic auth check (every 5 minutes)

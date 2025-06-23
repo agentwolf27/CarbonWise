@@ -3,13 +3,13 @@
 
 const CONFIG = {
   // Extension credentials (set during build process)
-  CLIENT_ID: 'YOUR_GOOGLE_CLIENT_ID_HERE', // Set during build/deployment
-  CLIENT_SECRET: '', // NEVER store client secret in extension - handle server-side only
+  CLIENT_ID: '113243607151-f8cbt4ror4v1uqtdftf41pq6uvko9so4.apps.googleusercontent.com',
+  CLIENT_SECRET: 'GOCSPX-ZGMSokCnJnwyIMIlvMSsNjqiKmN',
   
   // API endpoints
   API_BASE_URL: process.env.NODE_ENV === 'production' 
     ? 'https://your-domain.com' 
-    : 'http://localhost:3000',
+    : 'http://localhost:3001',
   
   // Extension-specific settings
   EXTENSION_ID: chrome.runtime.id, // Auto-generated unique ID

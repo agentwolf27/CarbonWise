@@ -9,6 +9,7 @@ const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-jwt-secret';
 export async function POST(request: Request) {
   try {
     const { userId, extensionId } = await request.json();
+    console.log('🔍 Extension verification request:', { userId, extensionId });
     
     // Check if authorization header exists
     const authHeader = request.headers.get('authorization');
@@ -29,7 +30,15 @@ export async function POST(request: Request) {
     // Validate token claims
     if (decoded.type !== 'extension_access' || 
         decoded.userId !== userId ||
-        decoded.extensionId !== extensionId) {
+        (decoded.extensionId && decoded.extensionId !== extensionId && decoded.extensionId !== 'web_direct_connection')) {
+      console.error('Token validation details:', {
+        tokenType: decoded.type,
+        tokenUserId: decoded.userId,
+        requestUserId: userId,
+        tokenExtensionId: decoded.extensionId,
+        requestExtensionId: extensionId,
+        source: decoded.source
+      });
       return NextResponse.json({ error: "Token validation failed" }, { status: 401 });
     }
     

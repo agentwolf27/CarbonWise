@@ -1,0 +1,86 @@
+[
+  {
+    "country": "Afghanistan",
+    "year": 2020,
+    "co2_per_capita": 0.297,
+    "electricity_per_capita": 702.888,
+    "gdp_per_capita": 1827.9901906827458
+  },
+  {
+    "country": "Afghanistan",
+    "year": 2021,
+    "co2_per_capita": 0.257,
+    "electricity_per_capita": 676.696,
+    "gdp_per_capita": 1415.9566766451476
+  },
+  {
+    "country": "Afghanistan",
+    "year": 2022,
+    "co2_per_capita": 0.26,
+    "electricity_per_capita": 0,
+    "gdp_per_capita": 1313.5778215082805
+  },
+  {
+    "country": "Afghanistan",
+    "year": 2023,
+    "co2_per_capita": 0.266,
+    "electricity_per_capita": 0,
+    "gdp_per_capita": 0
+  },
+  {
+    "country": "Africa",
+    "year": 2020,
+    "co2_per_capita": 0.983,
+    "electricity_per_capita": 3908.335,
+    "gdp_per_capita": 0
+  },
+  {
+    "country": "Africa",
+    "year": 2021,
+    "co2_per_capita": 1.021,
+    "electricity_per_capita": 4136.617,
+    "gdp_per_capita": 0
+  },
+  {
+    "country": "Africa",
+    "year": 2022,
+    "co2_per_capita": 0.991,
+    "electricity_per_capita": 4079.04,
+    "gdp_per_capita": 0
+  },
+  {
+    "country": "Africa",
+    "year": 2023,
+    "co2_per_capita": 0.959,
+    "electricity_per_capita": 3969.284,
+    "gdp_per_capita": 0
+  },
+  {
+    "country": "Albania",
+    "year": 2020,
+    "co2_per_capita": 1.64,
+    "electricity_per_capita": 11158.003,
+    "gdp_per_capita": 11187.769529494062
+  },
+  {
+    "country": "Albania",
+    "year": 2021,
+    "co2_per_capita": 1.802,
+    "electricity_per_capita": 14100.432,
+    "gdp_per_capita": 12235.558882288062
+  },
+  {
+    "country": "Albania",
+    "year": 2022,
+    "co2_per_capita": 1.83,
+    "electricity_per_capita": 0,
+    "gdp_per_capita": 12792.054771247147
+  },
+  {
+    "country": "Albania",
+    "year": 2023,
+    "co2_per_capita": 1.83,
+    "electricity_per_capita": 0,
+    "gdp_per_capita": 0
+  }
+]

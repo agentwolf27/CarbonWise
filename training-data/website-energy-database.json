@@ -1,0 +1,210 @@
+[
+  {
+    "domain": "google.com",
+    "category": "search",
+    "avg_page_load_kb": 2400,
+    "energy_per_visit_wh": 4.6,
+    "co2_per_visit_g": 2.9,
+    "data_source": "Website_Carbon"
+  },
+  {
+    "domain": "bing.com",
+    "category": "search",
+    "avg_page_load_kb": 3200,
+    "energy_per_visit_wh": 5.2,
+    "co2_per_visit_g": 3.4,
+    "data_source": "Carbon_Trust"
+  },
+  {
+    "domain": "duckduckgo.com",
+    "category": "search",
+    "avg_page_load_kb": 890,
+    "energy_per_visit_wh": 1.8,
+    "co2_per_visit_g": 1.1,
+    "data_source": "Green_Web"
+  },
+  {
+    "domain": "facebook.com",
+    "category": "social",
+    "avg_page_load_kb": 5600,
+    "energy_per_visit_wh": 8.9,
+    "co2_per_visit_g": 5.7,
+    "data_source": "Digital_Rights"
+  },
+  {
+    "domain": "instagram.com",
+    "category": "social",
+    "avg_page_load_kb": 4200,
+    "energy_per_visit_wh": 7.1,
+    "co2_per_visit_g": 4.8,
+    "data_source": "Social_Impact"
+  },
+  {
+    "domain": "twitter.com",
+    "category": "social",
+    "avg_page_load_kb": 3100,
+    "energy_per_visit_wh": 5.8,
+    "co2_per_visit_g": 3.9,
+    "data_source": "Carbon_Analytics"
+  },
+  {
+    "domain": "linkedin.com",
+    "category": "social",
+    "avg_page_load_kb": 4800,
+    "energy_per_visit_wh": 7.8,
+    "co2_per_visit_g": 5.2,
+    "data_source": "Professional_Carbon"
+  },
+  {
+    "domain": "tiktok.com",
+    "category": "social",
+    "avg_page_load_kb": 6800,
+    "energy_per_visit_wh": 12.4,
+    "co2_per_visit_g": 8.1,
+    "data_source": "Video_Carbon"
+  },
+  {
+    "domain": "youtube.com",
+    "category": "streaming",
+    "avg_page_load_kb": 5200,
+    "energy_per_visit_wh": 9.2,
+    "co2_per_visit_g": 6.1,
+    "data_source": "Media_Impact"
+  },
+  {
+    "domain": "netflix.com",
+    "category": "streaming",
+    "avg_page_load_kb": 3800,
+    "energy_per_visit_wh": 6.4,
+    "co2_per_visit_g": 4.3,
+    "data_source": "Streaming_Carbon"
+  },
+  {
+    "domain": "twitch.tv",
+    "category": "streaming",
+    "avg_page_load_kb": 7200,
+    "energy_per_visit_wh": 14.1,
+    "co2_per_visit_g": 9.3,
+    "data_source": "Gaming_Carbon"
+  },
+  {
+    "domain": "spotify.com",
+    "category": "streaming",
+    "avg_page_load_kb": 2800,
+    "energy_per_visit_wh": 4.2,
+    "co2_per_visit_g": 2.8,
+    "data_source": "Audio_Carbon"
+  },
+  {
+    "domain": "amazon.com",
+    "category": "ecommerce",
+    "avg_page_load_kb": 4500,
+    "energy_per_visit_wh": 7.2,
+    "co2_per_visit_g": 4.9,
+    "data_source": "Retail_Carbon"
+  },
+  {
+    "domain": "ebay.com",
+    "category": "ecommerce",
+    "avg_page_load_kb": 3900,
+    "energy_per_visit_wh": 6.1,
+    "co2_per_visit_g": 4.1,
+    "data_source": "Marketplace_Carbon"
+  },
+  {
+    "domain": "shopify.com",
+    "category": "ecommerce",
+    "avg_page_load_kb": 3200,
+    "energy_per_visit_wh": 5.2,
+    "co2_per_visit_g": 3.5,
+    "data_source": "Platform_Carbon"
+  },
+  {
+    "domain": "openai.com",
+    "category": "ai",
+    "avg_page_load_kb": 2100,
+    "energy_per_visit_wh": 3.8,
+    "co2_per_visit_g": 2.5,
+    "data_source": "AI_Carbon"
+  },
+  {
+    "domain": "claude.ai",
+    "category": "ai",
+    "avg_page_load_kb": 1800,
+    "energy_per_visit_wh": 3.2,
+    "co2_per_visit_g": 2.1,
+    "data_source": "LLM_Carbon"
+  },
+  {
+    "domain": "chat.openai.com",
+    "category": "ai_chat",
+    "avg_page_load_kb": 2400,
+    "energy_per_visit_wh": 4.1,
+    "co2_per_visit_g": 2.7,
+    "data_source": "ChatGPT_Carbon"
+  },
+  {
+    "domain": "bard.google.com",
+    "category": "ai_chat",
+    "avg_page_load_kb": 2800,
+    "energy_per_visit_wh": 4.8,
+    "co2_per_visit_g": 3.2,
+    "data_source": "Bard_Carbon"
+  },
+  {
+    "domain": "cnn.com",
+    "category": "news",
+    "avg_page_load_kb": 6200,
+    "energy_per_visit_wh": 11.2,
+    "co2_per_visit_g": 7.4,
+    "data_source": "News_Carbon"
+  },
+  {
+    "domain": "bbc.com",
+    "category": "news",
+    "avg_page_load_kb": 3400,
+    "energy_per_visit_wh": 5.6,
+    "co2_per_visit_g": 3.7,
+    "data_source": "Media_Carbon"
+  },
+  {
+    "domain": "wikipedia.org",
+    "category": "reference",
+    "avg_page_load_kb": 680,
+    "energy_per_visit_wh": 1.2,
+    "co2_per_visit_g": 0.8,
+    "data_source": "Wiki_Carbon"
+  },
+  {
+    "domain": "gmail.com",
+    "category": "email",
+    "avg_page_load_kb": 2200,
+    "energy_per_visit_wh": 3.9,
+    "co2_per_visit_g": 2.6,
+    "data_source": "Email_Carbon"
+  },
+  {
+    "domain": "outlook.com",
+    "category": "email",
+    "avg_page_load_kb": 2800,
+    "energy_per_visit_wh": 4.6,
+    "co2_per_visit_g": 3.1,
+    "data_source": "Microsoft_Carbon"
+  },
+  {
+    "domain": "drive.google.com",
+    "category": "cloud",
+    "avg_page_load_kb": 3200,
+    "energy_per_visit_wh": 5.1,
+    "co2_per_visit_g": 3.4,
+    "data_source": "Cloud_Carbon"
+  },
+  {
+    "domain": "dropbox.com",
+    "category": "cloud",
+    "avg_page_load_kb": 2900,
+    "energy_per_visit_wh": 4.7,
+    "co2_per_visit_g": 3.1,
+    "data_source": "Storage_Carbon"
+  }
+]

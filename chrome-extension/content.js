@@ -448,6 +448,11 @@ class CarbonTracker {
         this.isTracking = false;
         this.currentDomain = window.location.hostname;
         this.trackedActivities = new Set();
+        this.startTime = Date.now();
+        this.clickCount = 0;
+        
+        // Track user interactions
+        document.addEventListener('click', () => this.clickCount++);
         
         this.init();
     }
@@ -488,6 +493,10 @@ class CarbonTracker {
         // Site-specific tracking
         if (this.currentDomain.includes('amazon')) {
             this.trackAmazon();
+        } else if (this.currentDomain.includes('netflix')) {
+            this.trackNetflix();
+        } else if (this.currentDomain.includes('youtube')) {
+            this.trackYouTube();
         } else if (this.currentDomain.includes('booking')) {
             this.trackBooking();
         } else if (this.currentDomain.includes('expedia')) {
@@ -637,6 +646,105 @@ class CarbonTracker {
         }
     }
     
+    trackNetflix() {
+        console.log('🎬 CarbonWise: Netflix tracking initialized');
+        
+        // Track when video starts playing
+        this.observeElement('.VideoContainer', () => {
+            this.detectNetflixStreaming();
+        });
+        
+        // Track when user clicks play button
+        this.observeElement('[data-uia="play-pause-button"]', (element) => {
+            element.addEventListener('click', () => {
+                setTimeout(() => this.detectNetflixStreaming(), 1000);
+            });
+        });
+        
+        // Track streaming every 30 seconds while video is playing
+        setInterval(() => {
+            if (this.isVideoPlaying()) {
+                this.detectNetflixStreaming();
+            }
+        }, 30000);
+    }
+    
+    trackYouTube() {
+        console.log('📺 CarbonWise: YouTube tracking initialized');
+        
+        // Track video watching
+        this.observeElement('#movie_player', () => {
+            this.detectYouTubeStreaming();
+        });
+        
+        // Track streaming every 30 seconds
+        setInterval(() => {
+            if (this.isVideoPlaying()) {
+                this.detectYouTubeStreaming();
+            }
+        }, 30000);
+    }
+    
+    async detectNetflixStreaming() {
+        try {
+            // Get video title if available
+            const titleElement = document.querySelector('[data-uia="video-title"]') || 
+                                document.querySelector('h1') ||
+                                document.querySelector('title');
+            
+            const videoTitle = titleElement ? titleElement.textContent : 'Netflix Video';
+            
+            await this.trackActivity({
+                type: 'Digital',
+                category: 'Streaming',
+                description: `Netflix streaming: ${videoTitle}`,
+                co2Amount: 0.12, // 0.12 kg CO2 per 30 seconds of streaming
+                metadata: {
+                    domain: 'netflix.com',
+                    service: 'Netflix',
+                    videoTitle: videoTitle,
+                    quality: 'HD' // Assume HD quality
+                }
+            });
+        } catch (error) {
+            console.error('Netflix tracking error:', error);
+        }
+    }
+    
+    async detectYouTubeStreaming() {
+        try {
+            const titleElement = document.querySelector('h1.title') || 
+                                document.querySelector('.title');
+            
+            const videoTitle = titleElement ? titleElement.textContent : 'YouTube Video';
+            
+            await this.trackActivity({
+                type: 'Digital',
+                category: 'Streaming',
+                description: `YouTube streaming: ${videoTitle}`,
+                co2Amount: 0.09, // 0.09 kg CO2 per 30 seconds of streaming
+                metadata: {
+                    domain: 'youtube.com',
+                    service: 'YouTube',
+                    videoTitle: videoTitle
+                }
+            });
+        } catch (error) {
+            console.error('YouTube tracking error:', error);
+        }
+    }
+    
+    isVideoPlaying() {
+        // Check if video is currently playing
+        const netflixPlayer = document.querySelector('.VideoContainer video');
+        const youtubePlayer = document.querySelector('#movie_player video');
+        
+        if (netflixPlayer && !netflixPlayer.paused) return true;
+        if (youtubePlayer && !youtubePlayer.paused) return true;
+        
+        return false;
+    }
+    
     trackDoorDash() {
         // Track food delivery orders
         this.observeElement('[data-testid="place-order-button"]', (element) => {
@@ -675,17 +783,23 @@ class CarbonTracker {
             const result = await chrome.storage.local.get(['carbonwise_token']);
             if (!result.carbonwise_token) return;
             
-            // Send to API
-            const response = await fetch('http://localhost:3000/api/carbon/activities', {
+            // Send to AI-enhanced API
+            const response = await fetch('http://localhost:3001/api/carbon/ai-enhanced', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${result.carbonwise_token}`
                 },
                 body: JSON.stringify({
-                    ...activity,
-                    timestamp: new Date().toISOString(),
-                    source: 'extension'
+                    url: window.location.href,
+                    timeOnPage: Math.floor((Date.now() - this.startTime) / 1000) || 60,
+                    pageTitle: document.title,
+                    scrollDepth: Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100) || 0,
+                    clickCount: this.clickCount || 0,
+                    deviceType: /Mobile|Android|iPhone/i.test(navigator.userAgent) ? 'mobile' : 'laptop',
+                    networkType: 'wifi',
+                    userAgent: navigator.userAgent,
+                    location: { lat: 0, lng: 0, country: 'US' }
                 })
             });
             

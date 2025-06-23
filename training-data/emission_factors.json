@@ -1,0 +1,51 @@
+{
+  "electricity": {
+    "us_average": 0.709,
+    "california": 0.334,
+    "texas": 0.651,
+    "new_york": 0.314
+  },
+  "transportation": {
+    "car_gasoline": 0.404,
+    "car_hybrid": 0.2,
+    "car_electric": 0.2,
+    "motorcycle": 0.22,
+    "bus": 0.177,
+    "train": 0.177,
+    "airplane_domestic": 0.385,
+    "airplane_international": 0.44
+  },
+  "food": {
+    "beef": 60,
+    "pork": 7.2,
+    "chicken": 6.1,
+    "fish_farmed": 5.1,
+    "cheese": 13.5,
+    "milk": 3.2,
+    "eggs": 4.2,
+    "rice": 2.7,
+    "wheat": 1.4,
+    "vegetables": 2,
+    "fruits": 1.1
+  },
+  "shipping": {
+    "standard_delivery": 0.5,
+    "express_delivery": 1.2,
+    "overnight_delivery": 2.5,
+    "drone_delivery": 0.1
+  },
+  "streaming": {
+    "video_sd": 0.0036,
+    "video_hd": 0.0072,
+    "video_4k": 0.0216,
+    "audio_streaming": 0.00072,
+    "gaming": 0.0144
+  },
+  "ecommerce": {
+    "digital_download": 0.01,
+    "small_package": 0.5,
+    "medium_package": 1.2,
+    "large_package": 2.8,
+    "furniture_delivery": 15
+  }
+}
