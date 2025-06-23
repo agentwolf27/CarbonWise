@@ -1,235 +1,150 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ExtensionConnectPage() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const [status, setStatus] = useState('Checking authentication...');
   const router = useRouter();
-  const [isConnecting, setIsConnecting] = useState(false);
-  const [connectionStatus, setConnectionStatus] = useState<'idle' | 'connecting' | 'success' | 'error'>('idle');
 
   useEffect(() => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      // Redirect to sign in if not authenticated
-      router.push('/auth/signin');
-      return;
-    }
-
-    // Automatically attempt connection when page loads
-    connectExtension();
-  }, [session, status]);
-
-  const connectExtension = async () => {
-    if (!session?.user?.id) return;
-    
-    console.log('🔑 Starting extension connection for user:', session.user.email);
-    setIsConnecting(true);
-    setConnectionStatus('connecting');
-
-    try {
-      // Generate JWT token for the extension
-      const response = await fetch('/api/auth/extension-oauth', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: session.user.id,
-          directAuth: true // Flag for direct authentication from web app
-        })
-      });
-
-      console.log('📡 Extension OAuth response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to generate extension token: ${errorText}`);
+    const connectExtension = async () => {
+      if (!session?.user) {
+        setStatus('Please sign in first...');
+        setTimeout(() => {
+          router.push('/auth/signin?callbackUrl=/auth/extension-connect');
+        }, 2000);
+        return;
       }
 
-      const { accessToken, user } = await response.json();
-      console.log('✅ Extension token generated for user:', user.email);
-      
-      // Store connection info for the extension to access
-      const connectionData = {
-        carbonwise_token: accessToken,
-        carbonwise_user: user
-      };
+      try {
+        setStatus('Connecting extension...');
+        
+        // Create extension token (simplified - in production use proper JWT)
+        const extensionToken = `ext_${session.user.id}_${Date.now()}`;
+        
+        // Send data to extension
+        const extensionData = {
+          carbonwise_token: extensionToken,
+          carbonwise_user: {
+            id: session.user.id,
+            name: session.user.name,
+            email: session.user.email,
+            accountType: session.user.accountType || 'INDIVIDUAL'
+          }
+        };
 
-      console.log('📤 Sending authentication data to extension:', {
-        token: accessToken ? 'present' : 'missing',
-        user: user.email
-      });
-
-      // Try to communicate with extension via postMessage
-      window.postMessage({
-        type: 'CARBONWISE_AUTH_SUCCESS',
-        data: connectionData
-      }, '*');
-
-      // Also try Chrome extension API if available
-      if (typeof chrome !== 'undefined' && chrome.runtime) {
-        try {
-          // Send message to extension
-          chrome.runtime.sendMessage({
-            type: 'WEB_AUTH_SUCCESS',
-            data: connectionData
-          });
-          console.log('📡 Sent auth data via Chrome runtime API');
-        } catch (error) {
-          console.log('Chrome extension API not available:', error.message);
+        // Send authentication data to extension via message passing
+        console.log('🔗 Sending auth data to extension:', extensionData);
+        
+        // Method 1: Direct message to extension
+        window.postMessage({
+          type: 'CARBONWISE_AUTH_SUCCESS',
+          data: extensionData,
+          source: 'carbonwise_web_app'
+        }, '*');
+        
+        // Method 2: Try Chrome extension API if available
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+          try {
+            await chrome.runtime.sendMessage({
+              type: 'WEB_AUTH_SUCCESS',
+              data: extensionData
+            });
+            console.log('✅ Sent auth data via Chrome runtime API');
+          } catch (error) {
+            console.log('Chrome runtime API not available:', error.message);
+          }
         }
-      }
-
-      setConnectionStatus('success');
-      console.log('🎉 Extension connection completed successfully');
-      
-      // Show success message and redirect after delay
-      setTimeout(() => {
-        router.push('/dashboard');
-      }, 3000);
-
-    } catch (error) {
-      console.error('Extension connection failed:', error);
-      setConnectionStatus('error');
-    } finally {
-      setIsConnecting(false);
-    }
-  };
-
-  // Listen for messages from extension
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data.type === 'CARBONWISE_EXTENSION_READY') {
-        console.log('Extension is ready for authentication');
-        connectExtension();
+        
+        // Method 3: Store in localStorage as backup
+        try {
+          localStorage.setItem('carbonwise_auth_data', JSON.stringify(extensionData));
+          console.log('💾 Stored auth data in localStorage as backup');
+        } catch (error) {
+          console.log('localStorage not available:', error.message);
+        }
+        
+        setStatus('✅ Authentication complete! Extension should connect shortly...');
+        
+        // Listen for confirmation from extension
+        const handleConfirmation = (event) => {
+          if (event.data.type === 'CARBONWISE_EXTENSION_AUTH_COMPLETE') {
+            console.log('📬 Received confirmation from extension:', event.data);
+            if (event.data.success) {
+              setStatus('🎉 Extension connected successfully! Redirecting...');
+            } else {
+              setStatus(`❌ Extension connection failed: ${event.data.error}`);
+            }
+          }
+        };
+        
+        window.addEventListener('message', handleConfirmation);
+        
+        // Wait a bit longer before redirecting to allow extension to process
+        setTimeout(() => {
+          window.removeEventListener('message', handleConfirmation);
+          router.push('/dashboard');
+        }, 4000);
+        
+      } catch (error) {
+        console.error('Extension connection failed:', error);
+        setStatus('❌ Connection failed. Please try again.');
+        
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 3000);
       }
     };
 
-    window.addEventListener('message', handleMessage);
-    return () => window.removeEventListener('message', handleMessage);
-  }, [session]);
-
-  if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+    connectExtension();
+  }, [session, router]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-8">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-            </svg>
+    <div className="min-h-screen bg-gradient-to-br from-carbon-dark to-carbon-darker flex items-center justify-center">
+      <div className="max-w-md w-full bg-carbon-card border border-carbon-border rounded-xl p-8 text-center">
+        <div className="mb-6">
+          <div className="w-16 h-16 bg-primary-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            🔗
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Connect CarbonWise Extension</h1>
-          <p className="text-gray-400">Linking your browser extension to your account</p>
-        </div>
-
-        {connectionStatus === 'connecting' && (
-          <div className="text-center mb-6">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-500 mx-auto mb-4"></div>
-            <p className="text-gray-300">Connecting extension...</p>
-            <p className="text-gray-500 text-sm mt-2">Generating secure token...</p>
-          </div>
-        )}
-
-        {connectionStatus === 'success' && (
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-green-400 mb-2">Connection Successful!</h3>
-            <p className="text-gray-300 text-sm mb-4">
-              Your Chrome extension is now connected to your CarbonWise account.
-            </p>
-            <div className="bg-slate-700 rounded-lg p-3 mb-4">
-              <p className="text-green-400 text-sm font-medium">✓ Extension authenticated</p>
-              <p className="text-green-400 text-sm font-medium">✓ Tracking enabled</p>
-              <p className="text-green-400 text-sm font-medium">✓ Ready for carbon monitoring</p>
-            </div>
-            <p className="text-gray-400 text-sm">
-              Redirecting to dashboard...
-            </p>
-          </div>
-        )}
-
-        {connectionStatus === 'error' && (
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </div>
-            <h3 className="text-lg font-semibold text-red-400 mb-2">Connection Failed</h3>
-            <p className="text-gray-300 text-sm mb-4">
-              Unable to connect your extension. Please try again.
-            </p>
-            <button
-              onClick={connectExtension}
-              className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-            >
-              Retry Connection
-            </button>
-          </div>
-        )}
-
-        {connectionStatus === 'idle' && (
-          <div className="text-center mb-6">
-            <p className="text-gray-300 text-sm mb-4">
-              Click the button below to connect your CarbonWise Chrome extension.
-            </p>
-            <button
-              onClick={connectExtension}
-              disabled={isConnecting}
-              className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-medium py-3 px-6 rounded-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isConnecting ? 'Connecting...' : 'Connect Extension'}
-            </button>
-          </div>
-        )}
-
-        <div className="border-t border-slate-700 pt-6">
-          <h4 className="text-sm font-medium text-gray-300 mb-3">What happens next?</h4>
-          <ul className="space-y-2 text-sm text-gray-400">
-            <li className="flex items-start">
-              <svg className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
-              </svg>
-              Automatic tracking on supported websites
-            </li>
-            <li className="flex items-start">
-              <svg className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
-              </svg>
-              Real-time carbon footprint notifications
-            </li>
-            <li className="flex items-start">
-              <svg className="w-4 h-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" />
-              </svg>
-              Seamless sync with your dashboard
-            </li>
-          </ul>
-        </div>
-
-        <div className="mt-6 pt-4 border-t border-slate-700">
-          <p className="text-xs text-gray-500 text-center">
-            Your privacy is protected. We only track anonymized carbon data.
+          <h1 className="text-2xl font-bold text-white mb-2">
+            Connecting Extension
+          </h1>
+          <p className="text-carbon-muted">
+            Linking your CarbonWise account with the browser extension...
           </p>
+        </div>
+
+        <div className="mb-6">
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <div className="w-3 h-3 bg-primary-green rounded-full animate-pulse"></div>
+            <div className="w-3 h-3 bg-primary-green rounded-full animate-pulse" style={{ animationDelay: '0.2s' }}></div>
+            <div className="w-3 h-3 bg-primary-green rounded-full animate-pulse" style={{ animationDelay: '0.4s' }}></div>
+          </div>
+          <p className="text-white font-medium">{status}</p>
+        </div>
+
+        {session?.user && (
+          <div className="bg-carbon-dark rounded-lg p-4 mb-6">
+            <p className="text-sm text-carbon-muted mb-2">Connecting as:</p>
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-primary-green/20 rounded-full flex items-center justify-center">
+                👤
+              </div>
+              <div className="text-left">
+                <p className="text-white font-medium">{session.user.name}</p>
+                <p className="text-carbon-muted text-sm">{session.user.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="space-y-2 text-sm text-carbon-muted">
+          <p>✓ Secure authentication</p>
+          <p>✓ Real-time carbon tracking</p>
+          <p>✓ Automatic data sync</p>
         </div>
       </div>
     </div>

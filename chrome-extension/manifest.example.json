@@ -1,0 +1,107 @@
+{
+  "manifest_version": 3,
+  "name": "CarbonWise Tracker",
+  "version": "1.0",
+  "description": "Track your carbon footprint automatically",
+  "permissions": [
+    "storage",
+    "identity",
+    "activeTab",
+    "scripting",
+    "notifications"
+  ],
+  "oauth2": {
+    "client_id": "YOUR_GOOGLE_OAUTH_CLIENT_ID.apps.googleusercontent.com",
+    "scopes": ["email", "profile"]
+  },
+  "host_permissions": [
+    "*://amazon.com/*",
+    "*://*.amazon.com/*",
+    "*://booking.com/*",
+    "*://*.booking.com/*",
+    "*://expedia.com/*",
+    "*://*.expedia.com/*",
+    "*://kayak.com/*",
+    "*://*.kayak.com/*",
+    "*://uber.com/*",
+    "*://*.uber.com/*",
+    "*://lyft.com/*",
+    "*://*.lyft.com/*",
+    "*://doordash.com/*",
+    "*://*.doordash.com/*",
+    "*://ubereats.com/*",
+    "*://*.ubereats.com/*",
+    "*://grubhub.com/*",
+    "*://*.grubhub.com/*",
+    "*://chat.openai.com/*",
+    "*://claude.ai/*",
+    "*://youtube.com/*",
+    "*://*.youtube.com/*",
+    "*://netflix.com/*",
+    "*://*.netflix.com/*",
+    "http://localhost:3000/*",
+    "http://localhost:3001/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://amazon.com/*",
+        "*://*.amazon.com/*",
+        "*://booking.com/*",
+        "*://*.booking.com/*",
+        "*://expedia.com/*",
+        "*://*.expedia.com/*",
+        "*://kayak.com/*",
+        "*://*.kayak.com/*",
+        "*://uber.com/*",
+        "*://*.uber.com/*",
+        "*://lyft.com/*",
+        "*://*.lyft.com/*",
+        "*://doordash.com/*",
+        "*://*.doordash.com/*",
+        "*://ubereats.com/*",
+        "*://*.ubereats.com/*",
+        "*://grubhub.com/*",
+        "*://*.grubhub.com/*",
+        "*://chat.openai.com/*",
+        "*://claude.ai/*",
+        "*://youtube.com/*",
+        "*://*.youtube.com/*",
+        "*://netflix.com/*",
+        "*://*.netflix.com/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "http://localhost:3000/auth/extension-connect*",
+        "http://localhost:3001/auth/extension-connect*"
+      ],
+      "js": ["auth-listener.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "CarbonWise Tracker"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["injected.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+} 

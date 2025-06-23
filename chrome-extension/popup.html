@@ -171,6 +171,104 @@
       margin: 10px 0;
       font-size: 12px;
     }
+
+    .user-info {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .user-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .live-status {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .stat-change {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .stat-trend {
+      font-size: 10px;
+      opacity: 0.7;
+      margin-top: 2px;
+    }
+
+    .recent-activity {
+      margin: 15px 0;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .activity-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .live-indicator {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .activity-list {
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .activity-item {
+      padding: 6px 0;
+      font-size: 11px;
+      opacity: 0.8;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .activity-item:last-child {
+      border-bottom: none;
+    }
+
+    .activity-item.placeholder {
+      text-align: center;
+      font-style: italic;
+      opacity: 0.6;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .btn.secondary {
+      background: rgba(255, 255, 255, 0.15);
+      font-size: 12px;
+      padding: 10px 12px;
+    }
+
+    .btn.logout {
+      background: rgba(255, 107, 107, 0.2);
+      border-color: rgba(255, 107, 107, 0.4);
+      font-size: 12px;
+      padding: 8px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -201,37 +299,65 @@
     
     <!-- Dashboard Section -->
     <div id="dashboardSection" class="dashboard-section">
+      <div class="user-info">
+        <div class="user-name" id="userName">Test User</div>
+        <div class="live-status">🟢 Live Tracking Active</div>
+      </div>
+      
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-value" id="todayEmissions">0.0</div>
           <div class="stat-label">kg CO₂ Today</div>
+          <div class="stat-change" id="todayChange">+0.0 this hour</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="weekEmissions">0.0</div>
+          <div class="stat-label">kg CO₂ This Week</div>
+          <div class="stat-change" id="weekChange">vs last week</div>
         </div>
         <div class="stat-card">
           <div class="stat-value" id="monthEmissions">0.0</div>
           <div class="stat-label">kg CO₂ This Month</div>
+          <div class="stat-trend" id="monthTrend">📈 Trending</div>
         </div>
       </div>
       
-      <button id="manualEntryBtn" class="btn">Add Manual Entry</button>
-      <button id="viewDashboardBtn" class="btn">Open Full Dashboard</button>
-      <button id="signOutBtn" class="btn">Sign Out</button>
+      <div class="recent-activity">
+        <div class="activity-header">
+          <span>Recent Activity</span>
+          <span class="live-indicator">🔴 Live</span>
+        </div>
+        <div class="activity-list" id="activityList">
+          <div class="activity-item placeholder">
+            <span>Browse supported sites to see live tracking...</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button id="manualEntryBtn" class="btn secondary">📝 Add Activity</button>
+        <button id="viewDashboardBtn" class="btn primary">📊 Full Dashboard</button>
+      </div>
+      
+      <button id="signOutBtn" class="btn logout">Sign Out</button>
       
       <div class="tracking-sites">
-        <div class="tracking-title">Tracking Active On:</div>
+        <div class="tracking-title">🎯 Active Tracking:</div>
         <div class="site-list">
-          <div class="site-item">Amazon</div>
-          <div class="site-item">Booking.com</div>
-          <div class="site-item">Expedia</div>
-          <div class="site-item">Kayak</div>
-          <div class="site-item">Uber</div>
-          <div class="site-item">Lyft</div>
-          <div class="site-item">DoorDash</div>
-          <div class="site-item">Uber Eats</div>
+          <div class="site-item">🛒 Amazon</div>
+          <div class="site-item">🏨 Booking</div>
+          <div class="site-item">🚗 Uber</div>
+          <div class="site-item">🍕 DoorDash</div>
+          <div class="site-item">🤖 ChatGPT</div>
+          <div class="site-item">🎥 YouTube</div>
+          <div class="site-item">📺 Netflix</div>
+          <div class="site-item">🧠 Claude</div>
         </div>
       </div>
     </div>
   </div>
   
   <script src="popup.js"></script>
+  <script src="debug-auth.js"></script>
 </body>
 </html> 

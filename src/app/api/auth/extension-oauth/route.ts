@@ -4,8 +4,7 @@ import jwt from 'jsonwebtoken';
 
 // In production, store these securely
 const EXTENSION_CLIENTS = {
-  // Extension client configurations loaded from environment variables
-  [process.env.GOOGLE_CLIENT_ID || 'default']: {
+  '113243607151-f8cbt4ror4v1uqtdftf41pq6uvko9so4.apps.googleusercontent.com': {
     secret: process.env.GOOGLE_CLIENT_SECRET || 'your-client-secret-here',
     name: 'CarbonWise Chrome Extension',
     allowedOrigins: ['chrome-extension://']

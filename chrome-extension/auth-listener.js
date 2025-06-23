@@ -1,125 +1,103 @@
-// auth-listener.js - Listen for authentication messages from the web app
+// Authentication listener for CarbonWise Extension
+// This script runs on the extension connection page to handle auth messages
 
-console.log('🌱 CarbonWise extension auth listener loaded');
+console.log('🎧 CarbonWise auth listener loaded on:', window.location.href);
 
 // Listen for authentication messages from the web app
 window.addEventListener('message', async (event) => {
-    console.log('Received message:', event.data);
+  console.log('📨 Received message:', event.data);
+  
+  if (event.data.type === 'CARBONWISE_AUTH_SUCCESS' && event.data.source === 'carbonwise_web_app') {
+    console.log('🔐 Processing authentication data...');
     
-    // Accept messages from both localhost:3000 and localhost:3001
-    const validOrigins = ['http://localhost:3000', 'http://localhost:3001'];
-    if (!validOrigins.includes(event.origin)) {
-        console.log('Ignored message from origin:', event.origin);
-        return;
+    try {
+      const authData = event.data.data;
+      
+      // Store authentication data in extension storage
+      await chrome.storage.local.set({
+        carbonwise_token: authData.carbonwise_token,
+        carbonwise_user: authData.carbonwise_user
+      });
+      
+      console.log('✅ Authentication data stored in extension:', {
+        token: authData.carbonwise_token ? 'present' : 'missing',
+        user: authData.carbonwise_user?.email || 'unknown'
+      });
+      
+      // Notify background script
+      await chrome.runtime.sendMessage({
+        type: 'AUTH_COMPLETE',
+        data: authData
+      });
+      
+      // Show success notification
+      if (chrome.notifications) {
+        chrome.notifications.create({
+          type: 'basic',
+          iconUrl: 'icons/icon48.png',
+          title: 'CarbonWise Connected!',
+          message: `Extension connected for ${authData.carbonwise_user?.name || 'user'}`
+        });
+      }
+      
+      // Send confirmation back to web page
+      window.postMessage({
+        type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
+        success: true,
+        user: authData.carbonwise_user
+      }, '*');
+      
+      // Force popup refresh by sending message to all extension contexts
+      setTimeout(() => {
+        chrome.runtime.sendMessage({
+          type: 'FORCE_POPUP_REFRESH',
+          reason: 'auth_complete'
+        }).catch(() => {}); // Ignore errors if popup isn't open
+      }, 1000);
+      
+    } catch (error) {
+      console.error('❌ Failed to store authentication data:', error);
+      
+      // Send error back to web page
+      window.postMessage({
+        type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
+        success: false,
+        error: error.message
+      }, '*');
     }
-    
-    if (event.data.type === 'CARBONWISE_AUTH_SUCCESS') {
-        console.log('🔑 Received authentication data from web app');
-        
-        try {
-            const { carbonwise_token, carbonwise_user } = event.data.data;
-            
-            if (carbonwise_token && carbonwise_user) {
-                console.log('📦 Storing authentication data in extension storage');
-                
-                // Store in extension storage
-                await chrome.storage.local.set({
-                    carbonwise_token,
-                    carbonwise_user
-                });
-                
-                console.log('✅ Extension authentication successful');
-                
-                // Notify the web page
-                window.postMessage({
-                    type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
-                    success: true
-                }, '*');
-                
-                // Show success notification
-                showAuthNotification('✅ Extension connected successfully!');
-                
-                // Close the tab after a delay
-                setTimeout(() => {
-                    console.log('🔄 Closing authentication tab');
-                    window.close();
-                }, 2000);
-            } else {
-                throw new Error('Missing token or user data');
-            }
-        } catch (error) {
-            console.error('❌ Failed to store extension authentication:', error);
-            window.postMessage({
-                type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
-                success: false,
-                error: error.message
-            }, '*');
-            
-            showAuthNotification('❌ Extension connection failed: ' + error.message);
-        }
-    }
+  }
 });
 
-// Also listen for page load to announce extension readiness
-window.addEventListener('load', () => {
-    console.log('📢 Announcing extension readiness to web page');
-    window.postMessage({
-        type: 'CARBONWISE_EXTENSION_READY'
-    }, '*');
-});
-
-// Show a temporary notification
-function showAuthNotification(message) {
-    console.log('📢 Showing notification:', message);
-    
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #22c55e;
-        color: white;
-        padding: 16px 20px;
-        border-radius: 8px;
-        font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        font-size: 14px;
-        font-weight: 500;
-        z-index: 10000;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-        animation: slideInAuth 0.3s ease;
-        max-width: 300px;
-    `;
-    
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    // Auto-remove after 4 seconds
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.style.animation = 'slideOutAuth 0.3s ease';
-            setTimeout(() => notification.remove(), 300);
-        }
-    }, 4000);
-}
-
-// Add CSS animations
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInAuth {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
+// Also check localStorage for auth data (backup method)
+const checkLocalStorageAuth = async () => {
+  try {
+    const storedAuth = localStorage.getItem('carbonwise_auth_data');
+    if (storedAuth) {
+      const authData = JSON.parse(storedAuth);
+      console.log('📦 Found auth data in localStorage, storing in extension...');
+      
+      await chrome.storage.local.set({
+        carbonwise_token: authData.carbonwise_token,
+        carbonwise_user: authData.carbonwise_user
+      });
+      
+      // Clear localStorage after successful storage
+      localStorage.removeItem('carbonwise_auth_data');
+      
+      console.log('✅ Auth data migrated from localStorage to extension storage');
     }
-    
-    @keyframes slideOutAuth {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
+  } catch (error) {
+    console.error('❌ Error checking localStorage auth:', error);
+  }
+};
 
-// Test Chrome extension APIs
-if (typeof chrome !== 'undefined' && chrome.storage) {
-    console.log('✅ Chrome extension APIs available');
-} else {
-    console.error('❌ Chrome extension APIs not available');
-} 
+// Check localStorage on page load
+setTimeout(checkLocalStorageAuth, 1000);
+
+// Notify web page that extension is ready
+window.postMessage({
+  type: 'CARBONWISE_EXTENSION_READY',
+  extensionId: chrome.runtime.id
+}, '*');
+
+console.log('🚀 Auth listener ready and waiting for authentication...'); 

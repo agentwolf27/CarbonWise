@@ -18,6 +18,46 @@ const siteConfigs = {
     },
     carbonFactor: 0.5 // kg CO2 per dollar
   },
+  'chat.openai.com': {
+    type: 'Digital',
+    selectors: {
+      messageInput: '[data-testid="textbox"]',
+      messages: '[data-testid*="conversation"]',
+      tokenUsage: '.token-count'
+    },
+    carbonFactor: 0.008, // kg CO2 per message
+    trackingType: 'messages'
+  },
+  'claude.ai': {
+    type: 'Digital',
+    selectors: {
+      messageInput: '[contenteditable="true"]',
+      messages: '[data-testid="message"]',
+      conversation: '.conversation'
+    },
+    carbonFactor: 0.006, // kg CO2 per message
+    trackingType: 'messages'
+  },
+  'youtube.com': {
+    type: 'Digital',
+    selectors: {
+      videoPlayer: '#movie_player',
+      videoTitle: 'h1.title',
+      videoDuration: '.ytp-time-duration'
+    },
+    carbonFactor: 0.0036, // kg CO2 per hour
+    trackingType: 'video_time'
+  },
+  'netflix.com': {
+    type: 'Digital',
+    selectors: {
+      videoPlayer: '.VideoContainer',
+      videoTitle: '[data-uia="video-title"]',
+      playButton: '[data-uia="play-pause-button"]'
+    },
+    carbonFactor: 0.0041, // kg CO2 per hour (higher quality)
+    trackingType: 'video_time'
+  },
   'booking.com': {
     type: 'Travel',
     selectors: {

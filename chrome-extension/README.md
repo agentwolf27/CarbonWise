@@ -167,4 +167,55 @@ chrome-extension/
 
 ---
 
-**Need help?** Check the console logs or review the authentication flow in the web app. 
+**Need help?** Check the console logs or review the authentication flow in the web app.
+
+## Setup Instructions
+
+1. **Configure OAuth Credentials**
+   - Copy `config.example.js` to `config.js`
+   - Copy `manifest.example.json` to `manifest.json`
+   - Replace `YOUR_GOOGLE_OAUTH_CLIENT_ID` and `YOUR_GOOGLE_OAUTH_CLIENT_SECRET` with your actual Google OAuth credentials
+
+2. **Get Google OAuth Credentials**
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing one
+   - Enable the Google+ API
+   - Go to "Credentials" and create OAuth 2.0 Client IDs
+   - Add `chrome-extension://[extension-id]` to authorized origins
+   - Copy the Client ID and Client Secret to your config files
+
+3. **Load the Extension**
+   - Open Chrome and go to `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked" and select this directory
+   - Note the extension ID and update it in your config if needed
+
+4. **Test the Extension**
+   - Visit one of the supported websites
+   - Click the extension icon to open the popup
+   - Sign in with Google to connect to CarbonWise
+
+## Supported Websites
+
+- Amazon
+- Booking.com
+- Expedia
+- Kayak
+- Uber
+- Lyft
+- DoorDash
+- UberEats
+- GrubHub
+- ChatGPT
+- Claude.ai
+- YouTube
+- Netflix
+
+## Files
+
+- `config.js` - Configuration with OAuth credentials (not tracked by git)
+- `manifest.json` - Chrome extension manifest (not tracked by git)
+- `background.js` - Service worker for the extension
+- `content.js` - Content script injected into supported websites
+- `popup.html/js` - Extension popup interface
+- `auth-listener.js` - Handles authentication from the web app 

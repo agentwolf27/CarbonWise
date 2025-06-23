@@ -64,3 +64,7 @@ logs
 
 # Generated files
 /src/generated/prisma
+
+# Chrome extension files with credentials (local development only)
+/chrome-extension/config.js
+/chrome-extension/manifest.json

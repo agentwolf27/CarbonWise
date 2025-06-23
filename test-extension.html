@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarbonWise Extension Tester</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .container {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #16a34a;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border: 1px solid #444;
+        }
+        .success {
+            background: #1a3a1a;
+            border-color: #22c55e;
+        }
+        .error {
+            background: #3a1a1a;
+            border-color: #ef4444;
+        }
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .activity-card {
+            background: #333;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .activity-card h3 {
+            margin: 0 0 10px 0;
+            color: #22c55e;
+        }
+        .live-stats {
+            background: #1a2a1a;
+            border: 1px solid #22c55e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌱 CarbonWise Extension Live Tester</h1>
+        <p>Test the real-time carbon tracking functionality of your extension.</p>
+        
+        <div id="authStatus" class="status">
+            <strong>Authentication Status:</strong> <span id="authText">Checking...</span>
+        </div>
+        
+        <div class="live-stats">
+            <h3>📊 Live Extension Stats</h3>
+            <div id="liveStats">Loading...</div>
+        </div>
+        
+        <h3>🧪 Quick Test Activities</h3>
+        <div class="activity-grid">
+            <div class="activity-card">
+                <h3>🤖 AI Chat</h3>
+                <p>Simulate AI conversation</p>
+                <button onclick="createAIActivity()">+0.15kg CO₂</button>
+            </div>
+            <div class="activity-card">
+                <h3>🎥 Video Stream</h3>
+                <p>YouTube/Netflix viewing</p>
+                <button onclick="createVideoActivity()">+0.36kg CO₂</button>
+            </div>
+            <div class="activity-card">
+                <h3>🛒 Online Shopping</h3>
+                <p>Amazon purchase</p>
+                <button onclick="createShoppingActivity()">+12.5kg CO₂</button>
+            </div>
+            <div class="activity-card">
+                <h3>🍕 Food Delivery</h3>
+                <p>DoorDash order</p>
+                <button onclick="createFoodActivity()">+3.2kg CO₂</button>
+            </div>
+            <div class="activity-card">
+                <h3>🚗 Transportation</h3>
+                <p>Uber ride</p>
+                <button onclick="createTransportActivity()">+4.8kg CO₂</button>
+            </div>
+            <div class="activity-card">
+                <h3>🎲 Random Activity</h3>
+                <p>Surprise emission</p>
+                <button onclick="createRandomActivity()">+Random kg CO₂</button>
+            </div>
+        </div>
+        
+        <div>
+            <button onclick="createBulkActivities()">🚀 Create 5 Random Activities</button>
+            <button onclick="clearActivities()">🗑️ Clear All Test Data</button>
+            <button onclick="checkExtensionStatus()">🔍 Check Extension Status</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        let authData = null;
+
+        // Check auth status on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await checkAuth();
+            await checkExtensionStatus();
+            
+            // Auto-refresh stats every 5 seconds
+            setInterval(updateLiveStats, 5000);
+        });
+
+        async function checkAuth() {
+            try {
+                if (typeof chrome !== 'undefined' && chrome.storage) {
+                    const result = await chrome.storage.local.get(['carbonwise_token', 'carbonwise_user']);
+                    
+                    if (result.carbonwise_token && result.carbonwise_user) {
+                        authData = result;
+                        document.getElementById('authText').innerHTML = `✅ Authenticated as ${result.carbonwise_user.name}`;
+                        document.getElementById('authStatus').className = 'status success';
+                    } else {
+                        document.getElementById('authText').innerHTML = '❌ Not authenticated - Please connect extension first';
+                        document.getElementById('authStatus').className = 'status error';
+                    }
+                } else {
+                    document.getElementById('authText').innerHTML = '⚠️ Extension API not available - Open from extension context';
+                    document.getElementById('authStatus').className = 'status error';
+                }
+            } catch (error) {
+                document.getElementById('authText').innerHTML = `❌ Error: ${error.message}`;
+                document.getElementById('authStatus').className = 'status error';
+            }
+        }
+
+        async function updateLiveStats() {
+            if (!authData) return;
+            
+            try {
+                const response = await fetch('http://localhost:3000/api/carbon/activities', {
+                    headers: {
+                        'Authorization': `Bearer ${authData.carbonwise_token}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const activities = data.data?.activities || [];
+                    
+                    const today = activities.filter(a => isToday(new Date(a.timestamp)));
+                    const todayTotal = today.reduce((sum, a) => sum + (a.amount || 0), 0);
+                    
+                    document.getElementById('liveStats').innerHTML = `
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; color: #22c55e;">${todayTotal.toFixed(1)}</div>
+                                <div style="font-size: 12px; opacity: 0.7;">kg CO₂ Today</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; color: #22c55e;">${activities.length}</div>
+                                <div style="font-size: 12px; opacity: 0.7;">Total Activities</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; color: #22c55e;">${today.length}</div>
+                                <div style="font-size: 12px; opacity: 0.7;">Today's Activities</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; font-size: 12px; opacity: 0.7;">
+                            Last updated: ${new Date().toLocaleTimeString()}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Failed to update stats:', error);
+            }
+        }
+
+        async function createActivity(activityData) {
+            if (!authData) {
+                alert('Please authenticate the extension first!');
+                return;
+            }
+
+            try {
+                const response = await fetch('http://localhost:3000/api/carbon/activities', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authData.carbonwise_token}`
+                    },
+                    body: JSON.stringify({
+                        ...activityData,
+                        userId: authData.carbonwise_user.id,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Created: ${activityData.description} (+${activityData.amount}kg CO₂)`);
+                    updateLiveStats();
+                } else {
+                    const error = await response.text();
+                    showResult(`❌ Failed: ${error}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, true);
+            }
+        }
+
+        function createAIActivity() {
+            createActivity({
+                type: 'Digital',
+                category: 'ChatGPT',
+                amount: 0.15,
+                description: 'AI conversation - 20 messages',
+                metadata: { messages: 20, model: 'GPT-4', source: 'test' }
+            });
+        }
+
+        function createVideoActivity() {
+            createActivity({
+                type: 'Digital',
+                category: 'YouTube',
+                amount: 0.36,
+                description: 'Video streaming - 10 minutes HD',
+                metadata: { duration: 10, quality: 'HD', source: 'test' }
+            });
+        }
+
+        function createShoppingActivity() {
+            createActivity({
+                type: 'Shopping',
+                category: 'Amazon',
+                amount: 12.5,
+                description: 'Online shopping order - $25',
+                metadata: { orderValue: 25, items: 3, source: 'test' }
+            });
+        }
+
+        function createFoodActivity() {
+            createActivity({
+                type: 'Food',
+                category: 'DoorDash',
+                amount: 3.2,
+                description: 'Food delivery order',
+                metadata: { distance: 2.5, restaurant: 'Test Restaurant', source: 'test' }
+            });
+        }
+
+        function createTransportActivity() {
+            createActivity({
+                type: 'Transportation',
+                category: 'Uber',
+                amount: 4.8,
+                description: 'Ride sharing - 8km trip',
+                metadata: { distance: 8, vehicleType: 'standard', source: 'test' }
+            });
+        }
+
+        function createRandomActivity() {
+            const activities = [
+                { type: 'Digital', category: 'Claude', amount: 0.12, description: 'AI chat session' },
+                { type: 'Digital', category: 'Netflix', amount: 0.82, description: '20min Netflix show' },
+                { type: 'Shopping', category: 'Amazon', amount: 8.3, description: 'Electronics purchase' },
+                { type: 'Food', category: 'Uber Eats', amount: 2.9, description: 'Lunch delivery' },
+                { type: 'Transportation', category: 'Lyft', amount: 6.1, description: 'Airport ride' }
+            ];
+            
+            const random = activities[Math.floor(Math.random() * activities.length)];
+            createActivity({
+                ...random,
+                metadata: { source: 'random_test', generated: true }
+            });
+        }
+
+        async function createBulkActivities() {
+            for (let i = 0; i < 5; i++) {
+                createRandomActivity();
+                await new Promise(resolve => setTimeout(resolve, 200)); // Small delay
+            }
+        }
+
+        function clearActivities() {
+            if (confirm('This will clear all test activities. Continue?')) {
+                // In a real app, you'd call an API endpoint to clear activities
+                showResult('⚠️ Clear function not implemented yet - manually delete from database');
+            }
+        }
+
+        async function checkExtensionStatus() {
+            try {
+                if (typeof chrome !== 'undefined' && chrome.runtime) {
+                    const manifest = chrome.runtime.getManifest();
+                    showResult(`✅ Extension loaded: ${manifest.name} v${manifest.version}`);
+                } else {
+                    showResult('❌ Extension API not available', true);
+                }
+            } catch (error) {
+                showResult(`❌ Extension error: ${error.message}`, true);
+            }
+        }
+
+        function showResult(message, isError = false) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `status ${isError ? 'error' : 'success'}`;
+            div.innerHTML = `<div>${message}</div><div style="font-size: 12px; opacity: 0.7;">${new Date().toLocaleTimeString()}</div>`;
+            results.appendChild(div);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (div.parentNode) {
+                    div.parentNode.removeChild(div);
+                }
+            }, 10000);
+        }
+
+        function isToday(date) {
+            const today = new Date();
+            return date.toDateString() === today.toDateString();
+        }
+    </script>
+</body>
+</html> 

@@ -90,6 +90,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       .catch(error => sendResponse({ success: false, error: error.message }));
     return true;
   }
+  
+  if (request.type === 'AUTH_COMPLETE') {
+    handleAuthComplete(request.data)
+      .then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
+  
+  if (request.type === 'WEB_AUTH_SUCCESS') {
+    handleWebAuthSuccess(request.data)
+      .then(() => sendResponse({ success: true }))
+      .catch(error => sendResponse({ success: false, error: error.message }));
+    return true;
+  }
+  
+  if (request.type === 'FORCE_POPUP_REFRESH') {
+    console.log('🔄 Broadcasting popup refresh request');
+    // This message will be handled by popup.js
+    sendResponse({ success: true });
+    return;
+  }
 });
 
 // Handle logout
@@ -166,6 +187,50 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 chrome.runtime.onStartup.addListener(() => {
   checkAuthStatus();
 });
+
+// Handle authentication completion
+async function handleAuthComplete(authData) {
+  try {
+    console.log('🔐 Processing auth completion in background:', authData);
+    
+    userToken = authData.carbonwise_token;
+    currentUser = authData.carbonwise_user;
+    
+    // Verify authentication
+    await checkAuthStatus();
+    
+    console.log('✅ Authentication processed successfully');
+  } catch (error) {
+    console.error('❌ Failed to process auth completion:', error);
+    throw error;
+  }
+}
+
+// Handle web authentication success
+async function handleWebAuthSuccess(authData) {
+  try {
+    console.log('🌐 Processing web auth success in background:', authData);
+    
+    // Store the auth data
+    await chrome.storage.local.set({
+      carbonwise_token: authData.carbonwise_token,
+      carbonwise_user: authData.carbonwise_user
+    });
+    
+    userToken = authData.carbonwise_token;
+    currentUser = authData.carbonwise_user;
+    isAuthenticated = true;
+    
+    // Update badge
+    chrome.action.setBadgeText({ text: '✓' });
+    chrome.action.setBadgeBackgroundColor({ color: '#22c55e' });
+    
+    console.log('✅ Web auth data stored successfully');
+  } catch (error) {
+    console.error('❌ Failed to store web auth data:', error);
+    throw error;
+  }
+}
 
 // Periodic auth check (every 5 minutes)
 setInterval(checkAuthStatus, 5 * 60 * 1000); 
