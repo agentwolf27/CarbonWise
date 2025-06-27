@@ -139,9 +139,9 @@ export default function HomePage() {
                   <span><span className="font-semibold text-white">Automated Reporting:</span> Generate compliance and sustainability reports with a single click.</span>
                 </li>
               </ul>
-              <button className="btn-secondary text-lg mt-4">
+              <Link href="/auth/signup" className="btn-secondary text-lg mt-4 inline-block">
                 Request Early Access
-              </button>
+              </Link>
             </div>
             <div className="relative h-96">
               <div className="absolute inset-0 bg-grid-pattern opacity-30"></div>

@@ -33,7 +33,7 @@ const Footer = () => {
                 <Twitter size={20} />
               </Link>
               <Link 
-                href="mailto:info@carbonwise.com" 
+                href="mailto:vishrutmalhotra8@gmail.com" 
                 className="text-carbon-muted hover:text-primary-green transition-colors"
                 aria-label="Email"
               >
@@ -98,19 +98,19 @@ const Footer = () => {
               <div className="flex items-center gap-3">
                 <Phone size={16} className="text-primary-green flex-shrink-0" />
                 <Link 
-                  href="tel:+1-555-123-4567" 
+                  href="tel:+1-415-632-7673" 
                   className="text-carbon-muted text-sm hover:text-primary-green transition-colors"
                 >
-                  +1 (555) 123-4567
+                  +1 (415) 632-7673
                 </Link>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={16} className="text-primary-green flex-shrink-0" />
                 <Link 
-                  href="mailto:info@carbonwise.com" 
+                  href="mailto:vishrutmalhotra8@gmail.com" 
                   className="text-carbon-muted text-sm hover:text-primary-green transition-colors"
                 >
-                  info@carbonwise.com
+                  vishrutmalhotra8@gmail.com
                 </Link>
               </div>
             </div>

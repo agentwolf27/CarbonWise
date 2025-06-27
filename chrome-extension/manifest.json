@@ -11,7 +11,7 @@
     "notifications"
   ],
   "oauth2": {
-    "client_id": "113243607151-f8cbt4ror4v1uqtdftf41pq6uvko9so4.apps.googleusercontent.com",
+    "client_id": "113243607151-42ob2kspfnchmevg0pq2ukb11lmb175j.apps.googleusercontent.com",
     "scopes": ["email", "profile"]
   },
   "host_permissions": [

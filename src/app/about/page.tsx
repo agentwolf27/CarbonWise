@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Users, Target, Award, Calendar, CheckCircle, Leaf, Brain, Shield } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
+import ProfileCard from '@/components/ProfileCard';
 
 export const metadata: Metadata = {
   title: 'About Us',
@@ -73,43 +74,43 @@ export default function AboutPage() {
           <div className="space-y-8">
             {[
               {
-                date: 'Q1 2022',
+                date: 'Q1 2025',
                 title: 'Idea Born',
                 description: 'Founded with the vision of making carbon tracking accessible to everyone.',
                 status: 'completed'
               },
               {
-                date: 'Q3 2022',
+                date: 'Q2 2025',
                 title: 'MVP Launch',
                 description: 'Released our first minimum viable product to a small group of beta users.',
                 status: 'completed'
               },
               {
-                date: 'Q1 2023',
+                date: 'Q3 2025',
                 title: 'AI Integration',
-                description: 'Introduced machine learning algorithms for better carbon footprint predictions.',
+                description: 'Introduced DeepSeek V3 and advanced machine learning algorithms for better carbon footprint predictions.',
                 status: 'completed'
               },
               {
-                date: 'Q3 2023',
+                date: 'Q4 2025',
                 title: 'Public Beta',
                 description: 'Opened our platform to the public with enhanced features and improved UI.',
                 status: 'completed'
               },
               {
-                date: 'Q1 2024',
+                date: 'Q4 2025',
                 title: 'API Release',
                 description: 'Launched comprehensive API for third-party integrations and enterprise clients.',
                 status: 'completed'
               },
               {
-                date: 'Q3 2024',
+                date: 'Q1 2026',
                 title: 'Mobile App',
-                description: 'Released native mobile applications for iOS and Android platforms.',
+                description: 'Native mobile applications for iOS and Android platforms in development.',
                 status: 'current'
               },
               {
-                date: 'Q1 2025',
+                date: 'Q2 2026',
                 title: 'Global Expansion',
                 description: 'Expanding to serve businesses and individuals across 50+ countries.',
                 status: 'upcoming'
@@ -158,62 +159,56 @@ export default function AboutPage() {
       <section className="py-20">
         <div className="container-carbon">
           <div className="text-center space-y-6 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">Our Team</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">Meet the Founder</h2>
             <p className="text-xl text-carbon-muted max-w-3xl mx-auto">
-              Meet the passionate individuals working to make sustainable living more accessible and impactful.
+              The passionate individual working to make sustainable living more accessible and impactful.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Sarah Chen',
-                role: 'CEO & Co-founder',
-                description: 'Former sustainability consultant with 10+ years in environmental tech.',
-                image: '/team-sarah.jpg'
-              },
-              {
-                name: 'Marcus Johnson',
-                role: 'CTO & Co-founder',
-                description: 'AI/ML expert who previously worked at leading tech companies.',
-                image: '/team-marcus.jpg'
-              },
-              {
-                name: 'Elena Rodriguez',
-                role: 'Head of Product',
-                description: 'UX designer passionate about creating intuitive environmental tools.',
-                image: '/team-elena.jpg'
-              },
-              {
-                name: 'David Kim',
-                role: 'Lead Data Scientist',
-                description: 'PhD in Environmental Science with expertise in carbon modeling.',
-                image: '/team-david.jpg'
-              },
-              {
-                name: 'Lisa Wang',
-                role: 'Head of Marketing',
-                description: 'Growth expert helping spread awareness about carbon tracking.',
-                image: '/team-lisa.jpg'
-              },
-              {
-                name: 'Alex Thompson',
-                role: 'Lead Engineer',
-                description: 'Full-stack developer building scalable carbon tracking solutions.',
-                image: '/team-alex.jpg'
-              },
-            ].map((member, index) => (
-              <div key={index} className="card bg-carbon-card border border-carbon-border rounded-xl p-6 text-center space-y-4">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary-green/20 to-carbon-accent/20 rounded-full mx-auto flex items-center justify-center">
-                  <Users size={32} className="text-primary-green" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{member.name}</h3>
-                  <p className="text-primary-green font-medium mb-2">{member.role}</p>
-                  <p className="text-carbon-muted text-sm">{member.description}</p>
-                </div>
+          <div className="flex justify-center">
+            <ProfileCard
+              name="Vishrut Malhotra"
+              title="Founder & Full-Stack Developer"
+              handle="vishrut"
+              status="Building"
+              contactText="Contact Me"
+              avatarUrl="https://github.com/vishrutmalhotra.png"
+              showUserInfo={true}
+              enableTilt={true}
+            />
+          </div>
+
+          <div className="mt-12 max-w-2xl mx-auto text-center space-y-6">
+            <div className="card bg-carbon-card border border-carbon-border rounded-xl p-8 space-y-4">
+              <h3 className="text-2xl font-semibold text-white">About Vishrut</h3>
+              <p className="text-carbon-muted leading-relaxed">
+                Vishrut Malhotra is a 4th-year Computer Science student at San Francisco State University with a passion for environmental technology and AI. 
+                As the sole founder and developer of CarbonWise, he combines his technical expertise in full-stack development with his commitment to sustainability.
+              </p>
+              <p className="text-carbon-muted leading-relaxed">
+                Starting as a solo project in 2025, CarbonWise has grown from an idea to a fully functional platform featuring AI-powered carbon tracking, 
+                real-time analytics, and comprehensive APIs. Vishrut handles everything from backend architecture and AI integration to frontend design and user experience.
+              </p>
+              <div className="flex flex-wrap justify-center gap-2 mt-6">
+                {[
+                  'Full-Stack Development',
+                  'AI Integration',
+                  'React/Next.js',
+                  'Node.js',
+                  'TypeScript',
+                  'Prisma',
+                  'API Design',
+                  'UI/UX Design'
+                ].map((skill, index) => (
+                  <span 
+                    key={index} 
+                    className="text-xs font-medium text-primary-green bg-primary-green/10 px-3 py-1 rounded-full"
+                  >
+                    {skill}
+                  </span>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

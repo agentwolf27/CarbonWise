@@ -12,6 +12,7 @@ import Footer from '@/components/Footer';
 import CarbonChart from '@/components/CarbonChart';
 import { useCarbonData } from '@/hooks/useCarbonData';
 import AddActivityModal from '@/components/AddActivityModal';
+import Link from 'next/link';
 
 const RecommendationCard = ({ recommendation }) => {
   if (!recommendation) return null;
@@ -343,9 +344,9 @@ export default function DashboardPage() {
                       <p>No activities found</p>
                     </div>
                   )}
-                  <button className="w-full py-3 text-center text-primary-green hover:bg-primary-green/5 rounded-lg transition-colors">
+                  <Link href="/activities" className="block w-full py-3 text-center text-primary-green hover:bg-primary-green/5 rounded-lg transition-colors">
                     View All Activities
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -397,18 +398,30 @@ export default function DashboardPage() {
                 <h2 className="text-xl font-bold text-white mb-6">Quick Actions</h2>
                 <div className="space-y-3">
                   {[
-                    { icon: Plus, label: 'Log Activity', action: 'log' },
-                    { icon: BarChart3, label: 'View Reports', action: 'reports' },
-                    { icon: Bell, label: 'Notifications', action: 'notifications' },
-                    { icon: Settings, label: 'Settings', action: 'settings' },
+                    { icon: Plus, label: 'Log Activity', action: 'log', onClick: () => setIsModalOpen(true) },
+                    { icon: BarChart3, label: 'View Reports', action: 'reports', href: '/reports' },
+                    { icon: Bell, label: 'Notifications', action: 'notifications', href: '/notifications' },
+                    { icon: Settings, label: 'Settings', action: 'settings', href: '/settings' },
                   ].map((action, index) => (
-                    <button 
-                      key={index}
-                      className="w-full flex items-center gap-3 p-3 text-left text-white hover:bg-carbon-dark/50 rounded-lg transition-colors"
-                    >
-                      <action.icon size={20} className="text-primary-green" />
-                      {action.label}
-                    </button>
+                    action.href ? (
+                      <Link
+                        key={index}
+                        href={action.href}
+                        className="w-full flex items-center gap-3 p-3 text-left text-white hover:bg-carbon-dark/50 rounded-lg transition-colors"
+                      >
+                        <action.icon size={20} className="text-primary-green" />
+                        {action.label}
+                      </Link>
+                    ) : (
+                      <button 
+                        key={index}
+                        onClick={action.onClick}
+                        className="w-full flex items-center gap-3 p-3 text-left text-white hover:bg-carbon-dark/50 rounded-lg transition-colors"
+                      >
+                        <action.icon size={20} className="text-primary-green" />
+                        {action.label}
+                      </button>
+                    )
                   ))}
                 </div>
               </div>

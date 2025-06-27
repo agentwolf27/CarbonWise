@@ -2,7 +2,7 @@
 
 import { Metadata } from 'next';
 import { useState } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle, Clock, Users } from 'lucide-react';
+import { Mail, Phone, Send, CheckCircle, Clock } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
@@ -184,23 +184,16 @@ export default function ContactPage() {
                   {
                     icon: Mail,
                     title: 'Email us',
-                    description: 'Our friendly team is here to help.',
-                    contact: 'info@carbonwise.com',
-                    href: 'mailto:info@carbonwise.com'
+                    description: 'Our founder is here to help.',
+                    contact: 'vishrutmalhotra8@gmail.com',
+                    href: 'mailto:vishrutmalhotra8@gmail.com'
                   },
                   {
                     icon: Phone,
                     title: 'Call us',
                     description: 'Mon-Fri from 8am to 5pm PST.',
-                    contact: '+1 (555) 123-4567',
-                    href: 'tel:+1-555-123-4567'
-                  },
-                  {
-                    icon: MapPin,
-                    title: 'Visit us',
-                    description: 'Come say hello at our office.',
-                    contact: '123 Green Street, San Francisco, CA 94111',
-                    href: 'https://maps.google.com/?q=123+Green+Street+San+Francisco+CA'
+                    contact: '+1 (415) 632-7673',
+                    href: 'tel:+1-415-632-7673'
                   },
                 ].map((item, index) => (
                   <div key={index} className="card bg-carbon-card border border-carbon-border rounded-xl p-6">
@@ -292,59 +285,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-20">
-        <div className="container-carbon">
-          <div className="text-center space-y-6 mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-white">
-              Meet Our <span className="text-primary-green">Team</span>
-            </h2>
-            <p className="text-xl text-carbon-muted max-w-3xl mx-auto">
-              The passionate individuals behind CarbonWise are here to help you succeed.
-            </p>
-          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Sarah Chen',
-                role: 'CEO & Co-founder',
-                email: 'sarah@carbonwise.com',
-                description: 'Environmental policy expert with 10+ years in sustainability.'
-              },
-              {
-                name: 'Marcus Johnson',
-                role: 'CTO & Co-founder',
-                email: 'marcus@carbonwise.com',
-                description: 'AI/ML engineer passionate about climate technology.'
-              },
-              {
-                name: 'Elena Rodriguez',
-                role: 'Head of Customer Success',
-                email: 'elena@carbonwise.com',
-                description: 'Dedicated to helping customers achieve their sustainability goals.'
-              },
-            ].map((member, index) => (
-              <div key={index} className="card bg-carbon-card border border-carbon-border rounded-xl p-6 text-center space-y-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary-green/20 to-carbon-accent/20 rounded-full mx-auto flex items-center justify-center">
-                  <Users size={32} className="text-primary-green" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white">{member.name}</h3>
-                  <p className="text-primary-green font-medium mb-2">{member.role}</p>
-                  <p className="text-carbon-muted text-sm mb-3">{member.description}</p>
-                  <a
-                    href={`mailto:${member.email}`}
-                    className="text-primary-green hover:underline text-sm font-medium"
-                  >
-                    {member.email}
-                  </a>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>

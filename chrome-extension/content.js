@@ -358,7 +358,7 @@ async function trackActivity(activity) {
   try {
     // Send to background script
     const response = await chrome.runtime.sendMessage({
-      action: 'trackActivity',
+      type: 'TRACK_ACTIVITY',
       activity: activity
     });
     
@@ -429,7 +429,7 @@ function showTrackingNotification(activity) {
 
 // Listen for messages from popup/background
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === 'checkCurrentSite') {
+  if (request.type === 'checkCurrentSite') {
     sendResponse({
       domain: currentDomain,
       isSupported: !!siteConfig,
@@ -437,7 +437,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     });
   }
   
-  if (request.action === 'manualCheck') {
+  if (request.type === 'manualCheck') {
     checkForActivities();
     sendResponse({ success: true });
   }

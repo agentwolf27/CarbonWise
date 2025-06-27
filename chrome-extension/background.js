@@ -1,6 +1,6 @@
 // Background service worker for CarbonWise Chrome Extension
 
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = 'http://localhost:3000';
 
 // Authentication state
 let isAuthenticated = false;
@@ -92,13 +92,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
   
   if (request.type === 'TRACK_ACTIVITY') {
-    if (isAuthenticated) {
-      trackCarbonActivity(request.activity)
-        .then(success => sendResponse({ success }))
-        .catch(error => sendResponse({ success: false, error: error.message }));
-    } else {
-      sendResponse({ success: false, error: 'Not authenticated' });
-    }
+    console.log('🎯 Background: Received TRACK_ACTIVITY message:', request.activity);
+    
+    // Check authentication directly from storage for each request
+    trackCarbonActivityWithAuth(request.activity)
+      .then(success => {
+        console.log('✅ Background: Activity tracking result:', success);
+        sendResponse({ success });
+      })
+      .catch(error => {
+        console.error('❌ Background: Activity tracking failed:', error);
+        sendResponse({ success: false, error: error.message });
+      });
+    
     return true; // Keep message channel open for async response
   }
   
@@ -145,13 +151,41 @@ async function handleLogout() {
   }
 }
 
+// Track carbon activity with fresh auth check
+async function trackCarbonActivityWithAuth(activity) {
+  console.log('🚀 trackCarbonActivityWithAuth called with:', activity);
+  
+  // Always check storage for fresh auth data
+  const result = await chrome.storage.local.get(['carbonwise_token', 'carbonwise_user']);
+  
+  if (!result.carbonwise_token || !result.carbonwise_user) {
+    console.log('🚫 Not authenticated - no storage data:', result);
+    throw new Error('Not authenticated');
+  }
+  
+  // Update global variables if needed
+  if (userToken !== result.carbonwise_token) {
+    userToken = result.carbonwise_token;
+    currentUser = result.carbonwise_user;
+    isAuthenticated = true;
+    console.log('🔄 Updated auth state from storage');
+  }
+  
+  return trackCarbonActivity(activity);
+}
+
 // Track carbon activity
 async function trackCarbonActivity(activity) {
-  if (!isAuthenticated || !userToken) {
+  console.log('🚀 trackCarbonActivity called with:', activity);
+  
+  if (!userToken) {
+    console.log('🚫 No token available:', { hasToken: !!userToken });
     throw new Error('Not authenticated');
   }
   
   try {
+    console.log('📡 Sending to AI-enhanced endpoint:', `${API_BASE_URL}/api/carbon/ai-enhanced`);
+    
     // Use AI-enhanced carbon calculation
     const response = await fetch(`${API_BASE_URL}/api/carbon/ai-enhanced`, {
       method: 'POST',
@@ -172,13 +206,16 @@ async function trackCarbonActivity(activity) {
       })
     });
     
+    console.log('📊 Response status:', response.status);
+    
     if (!response.ok) {
       const errorText = await response.text();
+      console.error('❌ API Error:', response.status, errorText);
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
     
     const result = await response.json();
-    console.log('Activity tracked:', result);
+    console.log('✅ AI Activity tracked successfully:', result);
     
     // Show notification if permissions allow
     try {

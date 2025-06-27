@@ -280,3 +280,17 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Travel**: Booking.com, Expedia, Kayak
 - **Transportation**: Uber, Lyft
 - **Food Delivery**: DoorDash, Uber Eats, Grubhub
+
+## 🤖 **AI-Enhanced Carbon Tracking**
+
+CarbonWise now features intelligent activity classification powered by **DeepSeek V3** via OpenRouter:
+
+- **Smart Activity Detection**: Automatically classifies web activities (streaming, search, social media, AI interaction, etc.)
+- **Carbon Intensity Assessment**: Evaluates impact as LOW/MEDIUM/HIGH based on resource usage and user interaction
+- **Personalized Insights**: AI-generated recommendations for reducing your digital carbon footprint
+- **Real-time Emission Factors**: Integration with Climatiq API for accurate regional electricity data
+
+### AI Models Used:
+- **Primary**: DeepSeek V3 (via OpenRouter) - Cost-effective and high-performance
+- **Fallback**: Basic rule-based classification system
+- **Future**: Support for multiple AI providers through OpenRouter

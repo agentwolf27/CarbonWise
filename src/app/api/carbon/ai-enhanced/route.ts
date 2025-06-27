@@ -1,5 +1,5 @@
 // AI-Enhanced Carbon Calculation API Endpoint
-// Uses OpenAI o4 Mini for intelligent activity classification
+// Uses DeepSeek V3 via OpenRouter for intelligent activity classification
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log('🤖 Starting AI-enhanced carbon calculation for:', url);
+    console.log('🤖 Starting DeepSeek V3 (OpenRouter) enhanced carbon calculation for:', url);
 
     // Prepare user context for AI analysis
     const userContext = {
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       location: location || { lat: 37.7749, lng: -122.4194, country: 'US' }
     };
 
-    // Get AI-enhanced carbon calculation
+    // Get DeepSeek V3-enhanced carbon calculation
     const aiResult = await enhancedCarbonCalculation(url, timeOnPage, userContext);
 
     // Store the activity in database with AI insights
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         type: aiResult.activityType,
         category: getCategoryFromActivityType(aiResult.activityType),
         amount: aiResult.carbonEmission,
-        description: `AI-detected ${aiResult.activityType.toLowerCase().replace('_', ' ')} activity`,
+        description: `DeepSeek V3-detected ${aiResult.activityType.toLowerCase().replace('_', ' ')} activity`,
         location: userContext.location.country,
         metadata: JSON.stringify({
           url,
@@ -70,13 +70,13 @@ export async function POST(request: NextRequest) {
           confidence: aiResult.confidence,
           deviceType: userContext.deviceType,
           networkType: userContext.networkType,
-          aiModel: 'o4-mini'
+          aiModel: 'deepseek-v3-0324-openrouter'
         }),
         timestamp: new Date()
       }
     });
 
-    console.log('✅ AI-enhanced activity stored:', carbonActivity.id);
+    console.log('✅ DeepSeek V3 (OpenRouter) enhanced activity stored:', carbonActivity.id);
 
     return NextResponse.json({
       success: true,
@@ -88,14 +88,15 @@ export async function POST(request: NextRequest) {
       insights: aiResult.insights,
       recommendations: aiResult.recommendations,
       metadata: {
-        aiModel: 'o4-mini',
+        aiModel: 'deepseek-v3-0324-openrouter',
+        provider: 'OpenRouter',
         processingTime: 'optimized',
         dataSource: 'comprehensive_datasets'
       }
     });
 
   } catch (error) {
-    console.error('❌ AI-enhanced carbon calculation failed:', error);
+    console.error('❌ DeepSeek V3 (OpenRouter) enhanced carbon calculation failed:', error);
     
     // Fallback to basic calculation if AI fails
     try {
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
           type: 'OTHER',
           category: 'GENERAL',
           amount: basicEmission,
-          description: 'Basic calculation (AI unavailable)',
+          description: 'Basic calculation (DeepSeek V3 via OpenRouter unavailable)',
           location: 'Unknown',
           metadata: JSON.stringify({
             url,
@@ -125,7 +126,7 @@ export async function POST(request: NextRequest) {
         carbonEmission: basicEmission,
         activityType: 'OTHER',
         confidence: 0.5,
-        insights: ['Basic calculation used - AI enhancement temporarily unavailable'],
+        insights: ['Basic calculation used - DeepSeek V3 (OpenRouter) enhancement temporarily unavailable'],
         recommendations: ['Try again later for AI-powered insights'],
         fallback: true
       });

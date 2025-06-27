@@ -31,9 +31,10 @@ const websiteEnergyData = [
   
   // AI/LLM Platforms
   { domain: 'openai.com', category: 'ai', avg_page_load_kb: 2100, energy_per_visit_wh: 3.8, co2_per_visit_g: 2.5, data_source: 'AI_Carbon' },
-  { domain: 'claude.ai', category: 'ai', avg_page_load_kb: 1800, energy_per_visit_wh: 3.2, co2_per_visit_g: 2.1, data_source: 'LLM_Carbon' },
+  { domain: 'anthropic.com', category: 'ai', avg_page_load_kb: 1800, energy_per_visit_wh: 3.2, co2_per_visit_g: 2.1, data_source: 'Claude_Carbon' },
   { domain: 'chat.openai.com', category: 'ai_chat', avg_page_load_kb: 2400, energy_per_visit_wh: 4.1, co2_per_visit_g: 2.7, data_source: 'ChatGPT_Carbon' },
-  { domain: 'bard.google.com', category: 'ai_chat', avg_page_load_kb: 2800, energy_per_visit_wh: 4.8, co2_per_visit_g: 3.2, data_source: 'Bard_Carbon' },
+  { domain: 'chat.deepseek.com', category: 'ai_chat', avg_page_load_kb: 2200, energy_per_visit_wh: 3.9, co2_per_visit_g: 2.6, data_source: 'DeepSeek_Carbon' },
+  { domain: 'deepseek.com', category: 'ai', avg_page_load_kb: 1950, energy_per_visit_wh: 3.5, co2_per_visit_g: 2.3, data_source: 'DeepSeek_AI' },
   
   // News & Information
   { domain: 'cnn.com', category: 'news', avg_page_load_kb: 6200, energy_per_visit_wh: 11.2, co2_per_visit_g: 7.4, data_source: 'News_Carbon' },
@@ -52,9 +53,8 @@ const aiQueryEmissions = [
   // LLM APIs
   { service: 'openai_gpt4', category: 'text_generation', energy_per_1k_tokens_wh: 2.9, co2_per_1k_tokens_g: 1.4, cost_per_1k_tokens: 0.03, provider: 'OpenAI' },
   { service: 'openai_gpt35', category: 'text_generation', energy_per_1k_tokens_wh: 0.8, co2_per_1k_tokens_g: 0.4, cost_per_1k_tokens: 0.002, provider: 'OpenAI' },
-  { service: 'claude_opus', category: 'text_generation', energy_per_1k_tokens_wh: 2.1, co2_per_1k_tokens_g: 1.1, cost_per_1k_tokens: 0.015, provider: 'Anthropic' },
-  { service: 'claude_sonnet', category: 'text_generation', energy_per_1k_tokens_wh: 1.2, co2_per_1k_tokens_g: 0.6, cost_per_1k_tokens: 0.003, provider: 'Anthropic' },
-  { service: 'google_palm', category: 'text_generation', energy_per_1k_tokens_wh: 1.8, co2_per_1k_tokens_g: 0.9, cost_per_1k_tokens: 0.0005, provider: 'Google' },
+  { service: 'deepseek_v3', category: 'text_generation', energy_per_1k_tokens_wh: 0.7, co2_per_1k_tokens_g: 0.35, cost_per_1k_tokens: 0.001, provider: 'DeepSeek' },
+  { service: 'deepseek_chat', category: 'text_generation', energy_per_1k_tokens_wh: 0.75, co2_per_1k_tokens_g: 0.38, cost_per_1k_tokens: 0.0012, provider: 'DeepSeek' },
   
   // Image Generation
   { service: 'dalle_3', category: 'image_generation', energy_per_image_wh: 45.2, co2_per_image_g: 28.1, cost_per_image: 0.04, provider: 'OpenAI' },

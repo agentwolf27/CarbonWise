@@ -1,5 +1,5 @@
 // AI-Enhanced Carbon Footprint Calculator
-// Integrates multiple AI APIs for improved accuracy and intelligence
+// Integrates DeepSeek V3 via OpenRouter API for improved accuracy and intelligence
 
 import OpenAI from 'openai';
 
@@ -36,14 +36,15 @@ interface AIEnhancedResult {
 }
 
 export class AIEnhancedCarbonCalculator {
-  private openai: OpenAI;
+  private openrouterClient: OpenAI;
   private climatiqApiKey: string;
   private websiteEnergyDb: any[];
   private deviceEnergyDb: any[];
 
   constructor() {
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
+    this.openrouterClient = new OpenAI({
+      apiKey: process.env.DEEPSEEK_API_KEY, // OpenRouter API key
+      baseURL: 'https://openrouter.ai/api/v1',
     });
     this.climatiqApiKey = process.env.CLIMATIQ_API_KEY || '';
     this.loadDatabases();
@@ -120,7 +121,7 @@ export class AIEnhancedCarbonCalculator {
     };
   }
 
-  // AI-powered activity classification
+  // AI-powered activity classification using DeepSeek V3 via OpenRouter
   private async classifyActivityWithAI(input: CarbonCalculationInput) {
     const prompt = `
     Analyze this web activity and classify it for carbon footprint calculation:
@@ -148,18 +149,23 @@ export class AIEnhancedCarbonCalculator {
     - User interaction level
     - Likely backend processing requirements
     
-    Respond with JSON: {"category": "...", "intensity": "...", "reasoning": "..."}
+    Respond with ONLY a JSON object (no markdown formatting): {"category": "...", "intensity": "...", "reasoning": "..."}
     `;
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: "o4-mini",
+      const response = await this.openrouterClient.chat.completions.create({
+        model: "deepseek/deepseek-chat-v3-0324",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 200,
         temperature: 0.3
       });
 
-      const result = JSON.parse(response.choices[0].message.content || '{}');
+      let content = response.choices[0].message.content || '{}';
+      
+      // Remove markdown JSON formatting if present
+      content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      const result = JSON.parse(content);
       return {
         category: result.category || 'OTHER',
         intensity: result.intensity || 'MEDIUM',
@@ -167,7 +173,7 @@ export class AIEnhancedCarbonCalculator {
         confidence: 0.85
       };
     } catch (error) {
-      console.error('AI classification failed:', error);
+      console.error('DeepSeek V3 (OpenRouter) classification failed:', error);
       return {
         category: this.fallbackClassification(input.domain),
         intensity: 'MEDIUM',
@@ -205,7 +211,7 @@ export class AIEnhancedCarbonCalculator {
     return { electricityFactor: 0.709, confidence: 0.3 };
   }
 
-  // Generate AI insights and recommendations
+  // Generate AI insights and recommendations using DeepSeek V3
   private async generateAIInsights(input: CarbonCalculationInput, calculation: any) {
     const prompt = `
     Based on this web activity carbon calculation, provide insights and recommendations:
@@ -220,27 +226,32 @@ export class AIEnhancedCarbonCalculator {
     
     Keep responses concise and practical. Focus on digital behavior changes.
     
-    Respond with JSON: {
+    Respond with ONLY a JSON object (no markdown formatting): {
       "insights": ["insight1", "insight2"],
       "recommendations": ["rec1", "rec2"]
     }
     `;
 
     try {
-      const response = await this.openai.chat.completions.create({
-        model: "o4-mini",
+      const response = await this.openrouterClient.chat.completions.create({
+        model: "deepseek/deepseek-chat-v3-0324",
         messages: [{ role: "user", content: prompt }],
         max_tokens: 300,
         temperature: 0.7
       });
 
-      const result = JSON.parse(response.choices[0].message.content || '{}');
+      let content = response.choices[0].message.content || '{}';
+      
+      // Remove markdown JSON formatting if present
+      content = content.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+      
+      const result = JSON.parse(content);
       return {
         insights: result.insights || [],
         recommendations: result.recommendations || []
       };
     } catch (error) {
-      console.error('AI insights generation failed:', error);
+      console.error('DeepSeek V3 (OpenRouter) insights generation failed:', error);
       return {
         insights: ['This activity contributed to your digital carbon footprint'],
         recommendations: ['Consider reducing time on high-emission websites']

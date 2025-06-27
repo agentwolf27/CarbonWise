@@ -59,7 +59,7 @@ export default function SignUpPage() {
         return
       }
 
-      setSuccess('Account created successfully! Signing you in...')
+      setSuccess('🎉 Welcome to CarbonWise Early Access! Your account has been created and you\'re now enrolled in our exclusive beta program. Signing you in...')
       
       // Auto sign in after successful signup
       const result = await signIn('credentials', {
@@ -73,7 +73,7 @@ export default function SignUpPage() {
       } else {
         setTimeout(() => {
           router.push('/dashboard')
-        }, 1000)
+        }, 2000) // Give more time to read the success message
       }
 
     } catch (error) {
@@ -104,10 +104,10 @@ export default function SignUpPage() {
             <h1 className="text-2xl font-bold tracking-tight">CarbonWise</h1>
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-white">
-            Create your account
+            Join CarbonWise Early Access
           </h2>
           <p className="mt-2 text-carbon-muted">
-            Start tracking your carbon footprint today
+            Be among the first to experience AI-powered carbon tracking
           </p>
         </div>
 

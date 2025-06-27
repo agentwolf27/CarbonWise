@@ -1,10 +1,10 @@
-// Chrome Extension Configuration Template
-// Copy this file to config.js and replace with your actual values
+// Chrome Extension Configuration
+// Copy this file to config.js and replace placeholders with your actual credentials
 
 const CONFIG = {
   // Extension credentials (replace with your OAuth credentials)
-  CLIENT_ID: 'YOUR_GOOGLE_OAUTH_CLIENT_ID',
-  CLIENT_SECRET: 'YOUR_GOOGLE_OAUTH_CLIENT_SECRET',
+  CLIENT_ID: 'your_google_client_id_here.apps.googleusercontent.com',
+  CLIENT_SECRET: 'your_google_client_secret_here',
   
   // API endpoints
   API_BASE_URL: process.env.NODE_ENV === 'production' 
@@ -27,7 +27,11 @@ const CONFIG = {
     'lyft.com',
     'doordash.com',
     'ubereats.com',
-    'grubhub.com'
+    'grubhub.com',
+    'chat.openai.com',
+    'claude.ai',
+    'youtube.com',
+    'netflix.com'
   ],
   
   // Security settings

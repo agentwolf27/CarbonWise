@@ -68,3 +68,4 @@ logs
 # Chrome extension files with credentials (local development only)
 /chrome-extension/config.js
 /chrome-extension/manifest.json
+chrome-extension/config.js

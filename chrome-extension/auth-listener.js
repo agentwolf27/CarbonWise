@@ -6,7 +6,7 @@ console.log('🎧 CarbonWise auth listener loaded on:', window.location.href);
 // Listen for authentication messages from the web app
 window.addEventListener('message', async (event) => {
   console.log('📨 Received message:', event.data);
-  
+    
   if (event.data.type === 'CARBONWISE_AUTH_SUCCESS' && event.data.source === 'carbonwise_web_app') {
     console.log('🔐 Processing authentication data...');
     
@@ -23,7 +23,7 @@ window.addEventListener('message', async (event) => {
         token: authData.carbonwise_token ? 'present' : 'missing',
         user: authData.carbonwise_user?.email || 'unknown'
       });
-      
+                
       // Notify background script
       await chrome.runtime.sendMessage({
         type: 'AUTH_COMPLETE',
@@ -41,12 +41,12 @@ window.addEventListener('message', async (event) => {
       }
       
       // Send confirmation back to web page
-      window.postMessage({
-        type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
+                window.postMessage({
+                    type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
         success: true,
         user: authData.carbonwise_user
-      }, '*');
-      
+                }, '*');
+                
       // Force popup refresh by sending message to all extension contexts
       setTimeout(() => {
         chrome.runtime.sendMessage({
@@ -55,17 +55,17 @@ window.addEventListener('message', async (event) => {
         }).catch(() => {}); // Ignore errors if popup isn't open
       }, 1000);
       
-    } catch (error) {
+        } catch (error) {
       console.error('❌ Failed to store authentication data:', error);
       
       // Send error back to web page
-      window.postMessage({
-        type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
-        success: false,
-        error: error.message
-      }, '*');
+            window.postMessage({
+                type: 'CARBONWISE_EXTENSION_AUTH_COMPLETE',
+                success: false,
+                error: error.message
+            }, '*');
+        }
     }
-  }
 });
 
 // Also check localStorage for auth data (backup method)

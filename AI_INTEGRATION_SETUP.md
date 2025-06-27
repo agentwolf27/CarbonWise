@@ -5,14 +5,16 @@ This guide helps you integrate multiple AI APIs to enhance carbon footprint calc
 
 ## 🔑 **Required API Keys & Setup**
 
-### **1. OpenAI API (For Activity Classification)**
+### **1. DeepSeek API (For Activity Classification)**
 - **Purpose**: AI-powered activity classification and insights generation
 - **Cost**: $20 credits (lasts months for most usage)
 - **Setup**:
 ```bash
-# 1. Get API key from https://platform.openai.com/api-keys
-# 2. Add to your .env.local file:
-OPENAI_API_KEY=sk-your-openai-api-key-here
+# 1. Sign up at https://platform.deepseek.com
+# 2. Navigate to "API Keys" section
+# 3. Create a new API key
+# Add to your environment variables:
+DEEPSEEK_API_KEY=sk-or-v1-your-deepseek-api-key-here
 ```
 - **Models Used**: GPT-3.5-turbo (cost-effective for classification)
 
@@ -21,20 +23,19 @@ OPENAI_API_KEY=sk-your-openai-api-key-here
 - **Cost**: FREE tier (1,000 calls/month), then $29/month
 - **Setup**:
 ```bash
-# 1. Sign up at https://www.climatiq.io/
-# 2. Get API key from dashboard
-# 3. Add to .env.local:
+# 1. Sign up at https://climatiq.io
+# 2. Get your API key from dashboard
 CLIMATIQ_API_KEY=your-climatiq-api-key-here
 ```
 
-### **3. Optional: Google Gemini API (Alternative to OpenAI)**
+### **3. Optional: Google Gemini API (Alternative to DeepSeek)**
 - **Purpose**: Alternative AI for classification (cheaper option)
 - **Cost**: FREE tier generous, then $0.50/1M tokens
 - **Setup**:
 ```bash
-# 1. Get API key from https://makersuite.google.com/app/apikey
-# 2. Add to .env.local:
-GOOGLE_AI_API_KEY=your-google-ai-api-key-here
+# 1. Go to Google AI Studio
+# 2. Create API key
+GOOGLE_AI_API_KEY=your-google-ai-key-here
 ```
 
 ## 📊 **Enhanced Dataset Integration**
@@ -64,10 +65,15 @@ GOOGLE_AI_API_KEY=your-google-ai-api-key-here
 
 ### **Step 1: API Keys Setup**
 ```bash
-# Update your .env.local file
-echo "OPENAI_API_KEY=sk-your-key-here" >> .env.local
-echo "CLIMATIQ_API_KEY=your-climatiq-key" >> .env.local
-echo "GOOGLE_AI_API_KEY=your-google-key" >> .env.local
+# Create .env.local file
+touch .env.local
+
+# Add your API keys
+echo "DEEPSEEK_API_KEY=sk-or-v1-your-key-here" >> .env.local
+echo "CLIMATIQ_API_KEY=your-climatiq-key-here" >> .env.local
+
+# Optional backup AI provider
+echo "GOOGLE_AI_API_KEY=your-google-key-here" >> .env.local
 ```
 
 ### **Step 2: Test AI Integration**
@@ -226,9 +232,9 @@ const rateLimits = {
 ## 💰 **Cost Optimization**
 
 ### **Free Tier Strategy**
-1. **OpenAI**: Use GPT-3.5-turbo ($0.002/1K tokens) vs GPT-4 ($0.03/1K tokens)
+1. **DeepSeek**: Use GPT-3.5-turbo ($0.002/1K tokens) vs GPT-4 ($0.03/1K tokens)
 2. **Climatiq**: Cache emission factors, update daily (not per request)
-3. **Google**: Use Gemini for bulk processing (cheaper than OpenAI)
+3. **Google**: Use Gemini for bulk processing (cheaper than DeepSeek)
 
 ### **Estimated Monthly Costs**
 - **Light Usage** (1,000 users): $5-15/month
@@ -251,7 +257,7 @@ const rateLimits = {
 ## 🚀 **Next Steps**
 
 ### **Immediate (Today)**
-1. Set up OpenAI and Climatiq API keys
+1. Set up DeepSeek and Climatiq API keys
 2. Test basic AI integration
 3. Update extension to send enhanced data
 
@@ -267,4 +273,4 @@ const rateLimits = {
 
 ---
 
-**🎯 Ready to implement? Start with the OpenAI integration first - it provides the biggest accuracy boost with minimal setup!** 
+**🎯 Ready to implement? Start with the DeepSeek integration first - it provides the biggest accuracy boost with minimal setup!** 
