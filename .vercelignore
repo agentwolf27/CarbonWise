@@ -1,0 +1,12 @@
+# Don't upload local build artifacts / generated files.
+# Vercel regenerates the Prisma client via the postinstall script,
+# producing the correct Linux query engine instead of the local macOS one.
+node_modules
+.next
+out
+build
+src/generated
+
+# Local env files (set these in the Vercel dashboard instead)
+.env
+.env*.local
