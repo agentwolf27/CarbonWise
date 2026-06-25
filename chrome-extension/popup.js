@@ -507,7 +507,300 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 // Initialize popup when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Initializing CarbonWise extension popup');
-    new PopupManager();
+document.addEventListener('DOMContentLoaded', async function() {
+    console.log('🚀 CarbonWise popup loaded');
+    
+    await initializePopup();
+    await loadActivities();
+    
+    // Set up real-time updates every 30 seconds instead of 10
+    setInterval(loadActivities, 30000);
+});
+
+async function initializePopup() {
+    // Check auth status
+    const authResponse = await chrome.runtime.sendMessage({ type: 'GET_AUTH_STATUS' });
+    console.log('🔐 Auth status:', authResponse);
+    
+    const authSection = document.getElementById('auth-section');
+    const contentSection = document.getElementById('content-section');
+    const loginButton = document.getElementById('login-button');
+    const logoutButton = document.getElementById('logout-button');
+    const userInfo = document.getElementById('user-info');
+    
+    if (authResponse.isAuthenticated && authResponse.user) {
+        // Show main content
+        authSection.style.display = 'none';
+        contentSection.style.display = 'block';
+        
+        // Update user info
+        if (userInfo) {
+            userInfo.innerHTML = `
+                <div class="user-avatar">
+                    ${authResponse.user.image ? 
+                        `<img src="${authResponse.user.image}" alt="${authResponse.user.name}" />` :
+                        `<div class="avatar-placeholder">${authResponse.user.name?.[0] || 'U'}</div>`
+                    }
+                </div>
+                <div class="user-details">
+                    <div class="user-name">${authResponse.user.name || 'User'}</div>
+                    <div class="user-email">${authResponse.user.email}</div>
+                </div>
+            `;
+        }
+        
+        // Set up logout button
+        if (logoutButton) {
+            logoutButton.addEventListener('click', handleLogout);
+        }
+        
+    } else {
+        // Show auth section
+        authSection.style.display = 'block';
+        contentSection.style.display = 'none';
+        
+        // Set up login button
+        if (loginButton) {
+            loginButton.addEventListener('click', handleLogin);
+        }
+    }
+}
+
+async function handleLogin() {
+    console.log('🔑 Login requested');
+    
+    try {
+        // Open the web app's extension connect page
+        await chrome.tabs.create({
+            url: 'http://localhost:3000/auth/extension-connect',
+            active: true
+        });
+        
+        // Close the popup
+        window.close();
+        
+    } catch (error) {
+        console.error('❌ Login failed:', error);
+        showError('Failed to open login page');
+    }
+}
+
+async function handleLogout() {
+    console.log('🚪 Logout requested');
+    
+    try {
+        const response = await chrome.runtime.sendMessage({ type: 'LOGOUT' });
+        
+        if (response.success) {
+            // Refresh the popup to show login screen
+            await initializePopup();
+        } else {
+            showError('Failed to logout');
+        }
+    } catch (error) {
+        console.error('❌ Logout failed:', error);
+        showError('Failed to logout');
+    }
+}
+
+async function loadActivities() {
+    const activitiesList = document.getElementById('activities-list');
+    const loadingIndicator = document.getElementById('loading');
+    const errorElement = document.getElementById('error');
+    
+    if (!activitiesList) return;
+    
+    try {
+        // Show loading
+        if (loadingIndicator) loadingIndicator.style.display = 'block';
+        if (errorElement) errorElement.style.display = 'none';
+        
+        // Get auth status first
+        const authResponse = await chrome.runtime.sendMessage({ type: 'GET_AUTH_STATUS' });
+        
+        if (!authResponse.isAuthenticated) {
+            activitiesList.innerHTML = '<div class="empty-state">Please sign in to view activities</div>';
+            return;
+        }
+        
+        // Fetch activities from API with proper authentication
+        const storage = await chrome.storage.local.get(['carbonwise_token']);
+        const token = storage.carbonwise_token;
+        
+        if (!token) {
+            activitiesList.innerHTML = '<div class="empty-state">Authentication required</div>';
+            return;
+        }
+        
+        const response = await fetch('http://localhost:3000/api/carbon/activities?limit=10', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            if (response.status === 401) {
+                // Token expired, clear auth and refresh
+                await chrome.runtime.sendMessage({ type: 'LOGOUT' });
+                await initializePopup();
+                return;
+            }
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        
+        if (result.success && result.data.activities) {
+            const activities = result.data.activities;
+            
+            if (activities.length === 0) {
+                activitiesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">🌱</div>
+                        <div class="empty-title">No activities yet</div>
+                        <div class="empty-description">Start browsing to track your carbon footprint!</div>
+                    </div>
+                `;
+            } else {
+                activitiesList.innerHTML = activities
+                    .map(activity => createActivityElement(activity))
+                    .join('');
+            }
+            
+            // Update summary stats
+            updateSummaryStats(result.data);
+            
+        } else {
+            throw new Error('Invalid response format');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load activities:', error);
+        
+        if (activitiesList) {
+            activitiesList.innerHTML = `
+                <div class="error-state">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-title">Failed to load activities</div>
+                    <div class="error-description">${error.message}</div>
+                </div>
+            `;
+        }
+        
+        if (errorElement) {
+            errorElement.textContent = error.message;
+            errorElement.style.display = 'block';
+        }
+        
+    } finally {
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+    }
+}
+
+function createActivityElement(activity) {
+    const timeAgo = activity.timeAgo || getTimeAgo(new Date(activity.timestamp));
+    const icon = getActivityIcon(activity.type);
+    const amount = typeof activity.amount === 'number' ? activity.amount.toFixed(3) : '0.000';
+    
+    return `
+        <div class="activity-item">
+            <div class="activity-icon">${icon}</div>
+            <div class="activity-content">
+                <div class="activity-description">${activity.description || 'Unknown activity'}</div>
+                <div class="activity-meta">
+                    <span class="activity-type">${formatActivityType(activity.type)}</span>
+                    <span class="activity-time">${timeAgo}</span>
+                </div>
+            </div>
+            <div class="activity-amount">
+                <span class="amount">${amount}</span>
+                <span class="unit">kg CO₂</span>
+            </div>
+        </div>
+    `;
+}
+
+function updateSummaryStats(data) {
+    const todayTotal = document.getElementById('today-total');
+    const weekTotal = document.getElementById('week-total');
+    const activitiesCount = document.getElementById('activities-count');
+    
+    if (data.summary) {
+        if (todayTotal) todayTotal.textContent = `${data.summary.averageDaily.toFixed(3)} kg`;
+        if (weekTotal) weekTotal.textContent = `${data.summary.totalEmissions.toFixed(3)} kg`;
+        if (activitiesCount) activitiesCount.textContent = data.summary.activitiesCount;
+    } else {
+        // Calculate from activities array
+        const total = data.activities?.reduce((sum, activity) => sum + (activity.amount || 0), 0) || 0;
+        const count = data.activities?.length || 0;
+        
+        if (todayTotal) todayTotal.textContent = `${(total / Math.max(count, 1)).toFixed(3)} kg`;
+        if (weekTotal) weekTotal.textContent = `${total.toFixed(3)} kg`;
+        if (activitiesCount) activitiesCount.textContent = count;
+    }
+}
+
+function getActivityIcon(type) {
+    const icons = {
+        'STREAMING': '📺',
+        'BROWSING': '🌐',
+        'AI_INTERACTION': '🤖',
+        'SEARCH': '🔍',
+        'EMAIL': '📧',
+        'SOCIAL': '👥',
+        'SHOPPING': '🛒',
+        'GAMING': '🎮',
+        'VIDEO_CALL': '📹',
+        'FILE_TRANSFER': '📁',
+        'DEFAULT': '💻'
+    };
+    
+    return icons[type] || icons.DEFAULT;
+}
+
+function formatActivityType(type) {
+    return type.toLowerCase()
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+}
+
+function getTimeAgo(timestamp) {
+    const now = new Date();
+    const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
+    
+    if (diffInMinutes < 1) {
+        return 'Just now';
+    } else if (diffInMinutes < 60) {
+        return `${diffInMinutes}m ago`;
+    } else if (diffInMinutes < 1440) {
+        const hours = Math.floor(diffInMinutes / 60);
+        return `${hours}h ago`;
+    } else {
+        const days = Math.floor(diffInMinutes / 1440);
+        return `${days}d ago`;
+    }
+}
+
+function showError(message) {
+    const errorElement = document.getElementById('error');
+    if (errorElement) {
+        errorElement.textContent = message;
+        errorElement.style.display = 'block';
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+            errorElement.style.display = 'none';
+        }, 5000);
+    }
+}
+
+// Listen for auth updates from background script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'AUTH_STATUS_CHANGED') {
+        console.log('🔄 Auth status changed, refreshing popup');
+        initializePopup();
+    }
 }); 

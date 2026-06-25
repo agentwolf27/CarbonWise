@@ -11,12 +11,23 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
 
+interface ReportData {
+  summary: {
+    totalEmissions: number;
+    activitiesCount: number;
+    trend: number;
+    avgDaily: number;
+  };
+  breakdown: Record<string, number>;
+  insights: string[];
+}
+
 export default function ReportsPage() {
   const { data: session } = useSession();
   const [timeframe, setTimeframe] = useState('month');
   const [reportType, setReportType] = useState('summary');
   const [isLoading, setIsLoading] = useState(true);
-  const [reportData, setReportData] = useState(null);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
 
   useEffect(() => {
     fetchReportData();
@@ -62,7 +73,7 @@ export default function ReportsPage() {
     alert('Report emailed! (Feature coming soon)');
   };
 
-  const pieChartData = reportData?.breakdown || {};
+  const pieChartData: Record<string, number> = reportData?.breakdown || {};
   const total = Object.values(pieChartData).reduce((sum, val) => sum + val, 0);
 
   return (

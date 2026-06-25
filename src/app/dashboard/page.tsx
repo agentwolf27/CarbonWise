@@ -13,8 +13,9 @@ import CarbonChart from '@/components/CarbonChart';
 import { useCarbonData } from '@/hooks/useCarbonData';
 import AddActivityModal from '@/components/AddActivityModal';
 import Link from 'next/link';
+import type { Achievement } from '@/types/carbon';
 
-const RecommendationCard = ({ recommendation }) => {
+const RecommendationCard = ({ recommendation }: { recommendation: string | null }) => {
   if (!recommendation) return null;
   
   return (
@@ -32,7 +33,7 @@ const RecommendationCard = ({ recommendation }) => {
   );
 };
 
-const AchievementsList = ({ achievements }) => {
+const AchievementsList = ({ achievements }: { achievements?: Achievement[] }) => {
   if (!achievements || achievements.length === 0) {
     return (
       <div className="card bg-carbon-card border border-carbon-border rounded-xl p-6 text-center">
@@ -413,14 +414,14 @@ export default function DashboardPage() {
                         {action.label}
                       </Link>
                     ) : (
-                      <button 
-                        key={index}
+                    <button 
+                      key={index}
                         onClick={action.onClick}
-                        className="w-full flex items-center gap-3 p-3 text-left text-white hover:bg-carbon-dark/50 rounded-lg transition-colors"
-                      >
-                        <action.icon size={20} className="text-primary-green" />
-                        {action.label}
-                      </button>
+                      className="w-full flex items-center gap-3 p-3 text-left text-white hover:bg-carbon-dark/50 rounded-lg transition-colors"
+                    >
+                      <action.icon size={20} className="text-primary-green" />
+                      {action.label}
+                    </button>
                     )
                   ))}
                 </div>

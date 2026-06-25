@@ -348,7 +348,7 @@ export default function SettingsPage() {
                         <label className="relative inline-flex items-center cursor-pointer">
                           <input
                             type="checkbox"
-                            checked={notifications[key]}
+                            checked={notifications[key as keyof typeof notifications]}
                             onChange={(e) => setNotifications({ ...notifications, [key]: e.target.checked })}
                             className="sr-only peer"
                           />

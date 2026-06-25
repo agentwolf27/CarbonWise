@@ -10,13 +10,13 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
 // NextAuth.js required models
 model Account {
-  id                String  @id @default(cuid())
+  id                String  @id @default(uuid())
   userId            String
   type              String
   provider          String
@@ -35,7 +35,7 @@ model Account {
 }
 
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
@@ -48,26 +48,29 @@ enum UserAccountType {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String          @id @default(uuid())
   name          String?
-  email         String    @unique
+  email         String          @unique
   emailVerified DateTime?
   image         String?
-  password      String?   // For email/password authentication
-  role          String    @default("USER") // USER, ADMIN
-  accountType   UserAccountType @default(INDIVIDUAL)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  googleId      String?         @unique @map("google_id")
+  password      String? // For email/password authentication
+  role          String          @default("USER") // USER, ADMIN
+  accountType   UserAccountType @default(INDIVIDUAL) @map("account_type")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
 
   // Relations
-  accounts           Account[]
-  sessions           Session[]
-  carbonActivities   CarbonActivity[]
+  accounts          Account[]
+  sessions          Session[]
+  carbonActivities  CarbonActivity[]
+  digitalActivities DigitalActivity[]
   goals             Goal[]
   userSettings      UserSettings?
   teamMemberships   TeamMember[]
   achievements      Achievement[]
-  
+  aiInsights        AiInsight[]
+
   @@map("users")
 }
 
@@ -81,55 +84,98 @@ model VerificationToken {
 
 // Carbon tracking models
 model CarbonActivity {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // Cloud Computing, Data Transfer, etc.
-  category    String   // AWS EC2, CDN, etc.
-  amount      Float    // kg CO2
-  description String
-  location    String?
-  metadata    String?  // JSON string for additional data
-  timestamp   DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            String   @id @default(uuid())
+  userId        String   @map("user_id")
+  activityType  String   @map("activity_type") // transportation, digital, etc.
+  category      String? // car, streaming, etc.
+  description   String?
+  carbonFootprint Float  @map("carbon_footprint") // kg CO2
+  unit          String   @default("kg_co2")
+  activityDate  DateTime @default(now()) @map("activity_date")
+  source        String   @default("manual") // manual, extension, api
+  metadata      Json?    // JSON for additional data
+  aiEnhanced    Boolean  @default(false) @map("ai_enhanced")
+  aiConfidence  Float?   @map("ai_confidence")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("carbon_activities")
+  @@map("activities")
+}
+
+// Digital activities for web tracking (from Chrome extension)
+model DigitalActivity {
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  domain          String
+  pageTitle       String?  @map("page_title")
+  durationMinutes Int      @default(0) @map("duration_minutes")
+  activityType    String?  @map("activity_type") // STREAMING, SEARCH, etc.
+  intensityLevel  String   @default("medium") @map("intensity_level") // low, medium, high
+  carbonFootprint Float    @default(0) @map("carbon_footprint")
+  sessionId       String?  @map("session_id")
+  timestamp       DateTime @default(now())
+  metadata        Json?
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("digital_activities")
 }
 
 model Goal {
-  id          String   @id @default(cuid())
-  userId      String
-  title       String
-  description String?
-  target      Float    // Target value
-  current     Float    @default(0) // Current progress
-  unit        String   // kg CO2, %, etc.
-  period      String   // daily, weekly, monthly, yearly
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  goalType     String   @map("goal_type")
+  targetValue  Float    @map("target_value") // Target value
+  currentValue Float    @default(0) @map("current_value") // Current progress
+  unit         String   @default("kg_co2") // kg CO2, %, etc.
+  startDate    DateTime @map("start_date")
+  endDate      DateTime @map("end_date")
+  status       String   @default("active") // active, completed, paused
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("goals")
 }
 
+// AI insights for enhanced recommendations
+model AiInsight {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  insightType    String    @map("insight_type")
+  title          String
+  content        String
+  confidenceScore Float?   @map("confidence_score")
+  impactScore    Float?    @map("impact_score")
+  category       String?
+  status         String    @default("active") // active, dismissed, expired
+  generatedAt    DateTime  @default(now()) @map("generated_at")
+  expiresAt      DateTime? @map("expires_at")
+  metadata       Json?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_insights")
+}
+
 model UserSettings {
-  id                    String   @id @default(cuid())
-  userId                String   @unique
-  notifications         Boolean  @default(true)
-  emailNotifications    Boolean  @default(true)
-  theme                 String   @default("dark") // dark, light
-  timezone             String   @default("UTC")
-  carbonUnit           String   @default("kg") // kg, g, tons
-  privacyLevel         String   @default("private") // private, public, team
-  weeklyReports        Boolean  @default(true)
-  monthlyReports       Boolean  @default(true)
-  goalReminders        Boolean  @default(true)
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
+  id                 String   @id @default(uuid())
+  userId             String   @unique @map("user_id")
+  notifications      Boolean  @default(true)
+  emailNotifications Boolean  @default(true) @map("email_notifications")
+  theme              String   @default("dark") // dark, light
+  timezone           String   @default("UTC")
+  carbonUnit         String   @default("kg") @map("carbon_unit") // kg, g, tons
+  privacyLevel       String   @default("private") @map("privacy_level") // private, public, team
+  weeklyReports      Boolean  @default(true) @map("weekly_reports")
+  monthlyReports     Boolean  @default(true) @map("monthly_reports")
+  goalReminders      Boolean  @default(true) @map("goal_reminders")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -137,28 +183,31 @@ model UserSettings {
 }
 
 model Achievement {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // e.g., 'FIRST_ACTIVITY', 'REDUCED_EMISSIONS_STREAK'
-  name        String
-  description String
-  achievedAt  DateTime @default(now())
+  id              String   @id @default(uuid())
+  userId          String   @map("user_id")
+  achievementType String   @map("achievement_type") // e.g., 'FIRST_ACTIVITY', 'REDUCED_EMISSIONS_STREAK'
+  title           String
+  description     String?
+  icon            String?
+  points          Int      @default(0)
+  unlockedAt      DateTime @default(now()) @map("unlocked_at")
+  metadata        Json?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, type])
+  @@unique([userId, achievementType])
   @@map("achievements")
 }
 
 // Team/Organization models (for future use)
 model Team {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid())
   name        String
   description String?
   slug        String   @unique
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
   members TeamMember[]
 
@@ -166,11 +215,11 @@ model Team {
 }
 
 model TeamMember {
-  id       String @id @default(cuid())
-  userId   String
-  teamId   String
-  role     String @default("MEMBER") // ADMIN, MEMBER, VIEWER
-  joinedAt DateTime @default(now())
+  id       String   @id @default(uuid())
+  userId   String   @map("user_id")
+  teamId   String   @map("team_id")
+  role     String   @default("MEMBER") // ADMIN, MEMBER, VIEWER
+  joinedAt DateTime @default(now()) @map("joined_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   team Team @relation(fields: [teamId], references: [id], onDelete: Cascade)

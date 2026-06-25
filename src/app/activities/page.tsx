@@ -2,11 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from "next-auth/react";
-import { 
+import {
   Calendar, Filter, Search, MoreVertical, TrendingUp, TrendingDown,
   Globe, Zap, BarChart3, Target, Bell, Leaf, Chrome, Smartphone,
   ArrowLeft, ArrowRight, RefreshCw, Download, Eye, Trash2
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ interface Activity {
 }
 
 const getIconForActivityType = (type: string) => {
-  const icons = {
+  const icons: Record<string, LucideIcon> = {
     'Cloud Computing': Globe,
     'Data Transfer': Zap,
     'Video Streaming': BarChart3,
@@ -46,7 +47,7 @@ const getIconForActivityType = (type: string) => {
 };
 
 const getCategoryColor = (category: string) => {
-  const colors = {
+  const colors: Record<string, string> = {
     'HIGH': 'text-red-400 bg-red-400/10 border-red-400/20',
     'MEDIUM': 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20',
     'LOW': 'text-green-400 bg-green-400/10 border-green-400/20',
@@ -313,11 +314,11 @@ export default function ActivitiesPage() {
                   <p className="text-lg font-bold text-white">
                     {activities.length > 0 ? 
                       Object.entries(
-                        activities.reduce((acc, activity) => {
+                        activities.reduce((acc: Record<string, number>, activity) => {
                           acc[activity.type] = (acc[activity.type] || 0) + 1;
                           return acc;
-                        }, {})
-                      ).sort(([,a], [,b]) => b - a)[0]?.[0] || 'None'
+                        }, {} as Record<string, number>)
+                      ).sort(([, a], [, b]) => b - a)[0]?.[0] || 'None'
                       : 'None'
                     }
                   </p>

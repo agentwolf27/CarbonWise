@@ -15,7 +15,7 @@ interface CarbonCalculationResult {
 }
 
 // Carbon emission factors (kg CO2 per unit)
-const CARBON_FACTORS = {
+const CARBON_FACTORS: Record<string, any> = {
   // Shopping (per $ spent)
   shopping: {
     'amazon': { base: 0.5, categories: { 'electronics': 1.2, 'clothing': 0.8, 'books': 0.3 }},

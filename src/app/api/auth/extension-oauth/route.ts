@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import jwt from 'jsonwebtoken';
 
 // In production, store these securely
 const EXTENSION_CLIENTS = {
   '113243607151-f8cbt4ror4v1uqtdftf41pq6uvko9so4.apps.googleusercontent.com': {
-    secret: process.env.GOOGLE_CLIENT_SECRET || 'your-client-secret-here',
+    secret: process.env.GOOGLE_CLIENT_SECRET || 'your-client-secret',
     name: 'CarbonWise Chrome Extension',
     allowedOrigins: ['chrome-extension://']
   }
@@ -13,36 +15,48 @@ const EXTENSION_CLIENTS = {
 
 const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'your-jwt-secret';
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    
     const body = await request.json();
+    const { extensionId } = body;
     
-    // Handle direct authentication from web app
-    if (body.directAuth && body.userId) {
-      return await handleDirectAuth(body.userId);
+    if (!extensionId) {
+      return NextResponse.json({ error: "Extension ID required" }, { status: 400 });
     }
     
-    // Handle OAuth flow from extension
-    const { oauthToken, extensionId, clientId, code, redirectUri } = body;
-    
-    if (code && redirectUri) {
-      // Handle authorization code flow
-      return await handleOAuthCodeFlow(code, redirectUri, clientId);
-    }
-    
-    if (oauthToken && extensionId && clientId) {
-      // Handle token-based flow (legacy)
-      return await handleTokenFlow(oauthToken, extensionId, clientId);
-    }
+    // Generate JWT token for extension
+    const token = jwt.sign(
+      { 
+        userId: session.user.id,
+        email: session.user.email,
+        extensionId,
+        iat: Math.floor(Date.now() / 1000),
+        exp: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60) // 30 days
+      },
+      JWT_SECRET
+    );
     
     return NextResponse.json({ 
-      error: "Missing required fields" 
-    }, { status: 400 });
+      success: true,
+      carbonwise_token: token,
+      carbonwise_user: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name,
+        image: session.user.image
+      }
+    });
     
   } catch (error) {
-    console.error('Extension OAuth failed:', error);
+    console.error('Extension OAuth error:', error);
     return NextResponse.json(
-      { error: 'Authentication failed' },
+      { error: "Failed to generate extension token" },
       { status: 500 }
     );
   }
@@ -170,7 +184,7 @@ async function handleOAuthCodeFlow(code: string, redirectUri: string, clientId?:
 
 async function handleTokenFlow(oauthToken: string, extensionId: string, clientId: string) {
   // Verify client ID is registered
-  const client = EXTENSION_CLIENTS[clientId];
+  const client = EXTENSION_CLIENTS[clientId as keyof typeof EXTENSION_CLIENTS];
   if (!client) {
     return NextResponse.json({ 
       error: "Invalid client ID" 

@@ -60,15 +60,18 @@ export async function POST(request: Request) {
       }
     })
 
-    // Create default goals
+    // Create a default weekly goal (matches the Prisma Goal schema)
+    const now = new Date()
+    const weekEnd = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000)
     await prisma.goal.create({
       data: {
         userId: user.id,
-        title: "Weekly Carbon Goal",
-        description: "Reduce weekly carbon footprint",
-        target: 20,
-        unit: "kg CO₂",
-        period: "weekly",
+        goalType: "weekly_carbon_reduction",
+        targetValue: 20,
+        unit: "kg_co2",
+        startDate: now,
+        endDate: weekEnd,
+        status: "active",
       }
     })
 

@@ -1,56 +1,67 @@
+// Shared types for the carbon dashboard.
+// These mirror the shape returned by /api/carbon and the useCarbonData hook.
+
 export interface CarbonActivity {
-  id: number;
+  id: string;
   type: string;
-  category: string;
-  amount: number;
-  timestamp: Date;
+  category?: string;
   description: string;
-  location: string;
+  amount: number; // kg CO2
+  timestamp: string;
   timeAgo?: string;
+  location?: string;
+  source?: string;
+}
+
+export interface PeriodSummary {
+  value: number; // kg CO2
+  count: number;
+  change: number; // % change vs previous period
 }
 
 export interface CarbonSummary {
-  today: {
-    value: number;
-    change: number;
-    activities: number;
-  };
-  week: {
-    value: number;
-    change: number;
-    activities: number;
-  };
-  month: {
-    value: number;
-    change: number;
-    activities: number;
-  };
-  year: {
-    value: number;
-    change: number;
-    activities: number;
-  };
+  today: PeriodSummary;
+  week: PeriodSummary;
+  month: PeriodSummary;
+  year: PeriodSummary;
 }
 
+export interface ChartPoint {
+  date: string;
+  emissions: number; // kg CO2
+}
+
+// Legacy {labels, data} shape (kept for any chart utility that still uses it)
 export interface ChartData {
   labels: string[];
   data: number[];
 }
 
 export interface Goal {
-  id: number;
+  id: string;
   title: string;
   current: number;
   target: number;
   unit: string;
   percentage: number;
+  period?: string;
+  isActive?: boolean;
+}
+
+export interface Achievement {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  unlockedAt: string;
 }
 
 export interface CarbonDashboardData {
   summary: CarbonSummary;
-  chart: ChartData;
-  recentActivities: CarbonActivity[];
+  activities: CarbonActivity[];
   goals: Goal[];
+  achievements: Achievement[];
+  chart: ChartPoint[];
 }
 
 export interface CarbonApiResponse {
@@ -65,4 +76,4 @@ export interface NewCarbonActivity {
   amount: number;
   description: string;
   location: string;
-} 
+}

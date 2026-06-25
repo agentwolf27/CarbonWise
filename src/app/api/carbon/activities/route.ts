@@ -1,175 +1,72 @@
-import { NextResponse } from 'next/server';
-import type { NewCarbonActivity } from '@/types/carbon';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { resolveUserId } from '@/lib/extension-auth';
 
-// In a real app, this would be stored in a database
-let activities: any[] = [];
-
-export async function POST(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    // Check authentication - support both session and extension token
-    let userId = null;
-    
-    // First, try to get session (for web app)
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id) {
-      userId = session.user.id;
-    } else {
-      // Try extension authentication
-      const authHeader = request.headers.get('authorization');
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
-        
-        // For now, we'll extract userId from the request body
-        // In production, you'd decode it from the JWT token
-        const body = await request.json();
-        
-        // Simple token validation - in production use proper JWT
-        if (token && body.userId) {
-          userId = body.userId;
-        }
-      }
-    }
-    
+    // Auth: web session OR verified extension token
+    const userId = await resolveUserId(request);
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    
-    const body = await request.json();
-    const {
-      type,
-      category,
-      amount,
-      description,
-      location,
-      metadata,
-      source = 'manual'
-    } = body;
-    
-    // Validation
-    if (!type || !category || amount === undefined || !description) {
-      return NextResponse.json({ 
-        error: "Missing required fields: type, category, amount, description" 
-      }, { status: 400 });
+
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get('limit') || '50');
+    const offset = parseInt(searchParams.get('offset') || '0');
+    const type = searchParams.get('type');
+    const startDate = searchParams.get('startDate');
+    const endDate = searchParams.get('endDate');
+
+    // Build the Prisma filter
+    const where: any = { userId };
+    if (type) {
+      where.activityType = type;
     }
-    
-    if (typeof amount !== 'number' || amount < 0) {
-      return NextResponse.json({ 
-        error: "Amount must be a positive number" 
-      }, { status: 400 });
+    if (startDate || endDate) {
+      where.activityDate = {};
+      if (startDate) where.activityDate.gte = new Date(startDate);
+      if (endDate) where.activityDate.lte = new Date(endDate);
     }
-    
-    // Create carbon activity
-    const activity = await prisma.carbonActivity.create({
-      data: {
-        userId,
-        type,
-        category,
-        amount: parseFloat(amount),
-        description,
-        location: location || null,
-        metadata: typeof metadata === 'string' ? metadata : JSON.stringify(metadata || {}),
-        timestamp: new Date(),
-      }
-    });
-    
-    // Check for achievements
-    await checkAndAwardAchievements(userId);
-    
-    return NextResponse.json({
-      success: true,
-      activity: {
+
+    const [activities, total] = await Promise.all([
+      prisma.carbonActivity.findMany({
+        where,
+        orderBy: { activityDate: 'desc' },
+        skip: offset,
+        take: limit,
+      }),
+      prisma.carbonActivity.count({ where: { userId } }),
+    ]);
+
+    // Normalize to the shape the frontend expects
+    const activitiesWithTimeAgo = activities.map((activity) => {
+      const metadata = (activity.metadata as Record<string, any>) || {};
+      return {
         id: activity.id,
-        type: activity.type,
+        type: activity.activityType,
         category: activity.category,
-        amount: activity.amount,
+        amount: activity.carbonFootprint,
+        unit: activity.unit,
         description: activity.description,
-        timestamp: activity.timestamp
-      }
+        location: metadata.location ?? null,
+        source: activity.source,
+        metadata,
+        timestamp: activity.activityDate,
+        timeAgo: getTimeAgo(activity.activityDate),
+      };
     });
-    
-  } catch (error) {
-    console.error('Failed to create carbon activity:', error);
-    return NextResponse.json(
-      { success: false, error: 'Failed to create activity' },
-      { status: 500 }
-    );
-  }
-}
-
-async function checkAndAwardAchievements(userId: string) {
-  try {
-    // Get user's activity count
-    const activityCount = await prisma.carbonActivity.count({
-      where: { userId }
-    });
-    
-    // Award "First Activity" achievement
-    if (activityCount === 1) {
-      await prisma.achievement.upsert({
-        where: {
-          userId_type: {
-            userId,
-            type: 'FIRST_ACTIVITY'
-          }
-        },
-        update: {},
-        create: {
-          userId,
-          type: 'FIRST_ACTIVITY',
-          name: 'First Steps',
-          description: 'Tracked your first carbon activity',
-        }
-      });
-    }
-    
-    // Award milestone achievements
-    const milestones = [10, 50, 100, 500];
-    for (const milestone of milestones) {
-      if (activityCount === milestone) {
-        await prisma.achievement.upsert({
-          where: {
-            userId_type: {
-              userId,
-              type: `ACTIVITIES_${milestone}`
-            }
-          },
-          update: {},
-          create: {
-            userId,
-            type: `ACTIVITIES_${milestone}`,
-            name: `${milestone} Activities`,
-            description: `Tracked ${milestone} carbon activities`,
-          }
-        });
-      }
-    }
-    
-  } catch (error) {
-    console.error('Failed to check achievements:', error);
-    // Don't throw error as this is not critical
-  }
-}
-
-export async function GET() {
-  try {
-    // Return recent activities (in a real app, fetch from database)
-    const recentActivities = activities
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-      .slice(0, 10)
-      .map(activity => ({
-        ...activity,
-        timeAgo: getTimeAgo(new Date(activity.timestamp))
-      }));
 
     return NextResponse.json({
       success: true,
       data: {
-        activities: recentActivities,
-        total: activities.length
-      }
+        activities: activitiesWithTimeAgo,
+        total,
+        pagination: {
+          limit,
+          offset,
+          hasMore: total > offset + limit,
+        },
+      },
     });
   } catch (error) {
     console.error('Error fetching activities:', error);
@@ -180,10 +77,104 @@ export async function GET() {
   }
 }
 
+export async function POST(request: NextRequest) {
+  try {
+    // Auth: web session OR verified extension token
+    const userId = await resolveUserId(request);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const { type, category, amount, description, location, metadata, timestamp, source = 'manual' } = body;
+
+    // Validation
+    if (!type || !category || amount === undefined || !description) {
+      return NextResponse.json(
+        { error: 'Missing required fields: type, category, amount, description' },
+        { status: 400 }
+      );
+    }
+    if (typeof amount !== 'number' || amount < 0) {
+      return NextResponse.json({ error: 'Amount must be a positive number' }, { status: 400 });
+    }
+
+    const activity = await prisma.carbonActivity.create({
+      data: {
+        userId,
+        activityType: type,
+        category,
+        carbonFootprint: parseFloat(amount.toString()),
+        unit: 'kg_co2',
+        description,
+        source,
+        activityDate: timestamp ? new Date(timestamp) : new Date(),
+        // location has no dedicated column — fold it into metadata
+        metadata: { ...(metadata || {}), ...(location ? { location } : {}) },
+      },
+    });
+
+    // Award milestone achievements (fire-and-forget; not critical to the response)
+    checkAndAwardAchievements(userId).catch(console.error);
+
+    return NextResponse.json({
+      success: true,
+      activity: {
+        id: activity.id,
+        type: activity.activityType,
+        category: activity.category,
+        amount: activity.carbonFootprint,
+        description: activity.description,
+        timestamp: activity.activityDate,
+      },
+    });
+  } catch (error) {
+    console.error('Failed to create carbon activity:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to create activity' },
+      { status: 500 }
+    );
+  }
+}
+
+// Award activity-count milestone achievements via Prisma upsert (idempotent
+// thanks to the @@unique([userId, achievementType]) constraint).
+async function checkAndAwardAchievements(userId: string) {
+  try {
+    const activityCount = await prisma.carbonActivity.count({ where: { userId } });
+
+    const achievementsToCheck = [
+      { count: 1, type: 'first_activity', name: 'First Steps', description: 'Tracked your first carbon activity' },
+      { count: 10, type: 'activities_10', name: '10 Activities', description: 'Tracked 10 carbon activities' },
+      { count: 50, type: 'activities_50', name: '50 Activities', description: 'Tracked 50 carbon activities' },
+      { count: 100, type: 'activities_100', name: '100 Activities', description: 'Tracked 100 carbon activities' },
+      { count: 500, type: 'activities_500', name: '500 Activities', description: 'Tracked 500 carbon activities' },
+    ];
+
+    for (const achievement of achievementsToCheck) {
+      if (activityCount === achievement.count) {
+        await prisma.achievement.upsert({
+          where: { userId_achievementType: { userId, achievementType: achievement.type } },
+          create: {
+            userId,
+            achievementType: achievement.type,
+            title: achievement.name,
+            description: achievement.description,
+          },
+          update: {},
+        });
+      }
+    }
+  } catch (error) {
+    console.error('Failed to check achievements:', error);
+    // Non-critical — never throw from here
+  }
+}
+
 function getTimeAgo(timestamp: Date): string {
   const now = new Date();
   const diffInMinutes = Math.floor((now.getTime() - timestamp.getTime()) / (1000 * 60));
-  
+
   if (diffInMinutes < 1) {
     return 'Just now';
   } else if (diffInMinutes < 60) {
@@ -195,4 +186,4 @@ function getTimeAgo(timestamp: Date): string {
     const days = Math.floor(diffInMinutes / 1440);
     return `${days} day${days > 1 ? 's' : ''} ago`;
   }
-} 
+}

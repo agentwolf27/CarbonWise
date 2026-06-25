@@ -206,7 +206,7 @@ chrome-extension/
 - DoorDash
 - UberEats
 - GrubHub
-- ChatGPT
+- DeepSeek
 - Claude.ai
 - YouTube
 - Netflix

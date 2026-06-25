@@ -70,7 +70,7 @@ export default function ExtensionConnectPage() {
             });
             console.log('✅ Sent auth data via Chrome runtime API');
           } catch (error) {
-            console.log('Chrome runtime API not available:', error.message);
+            console.log('Chrome runtime API not available:', error instanceof Error ? error.message : error);
           }
         }
         
@@ -79,13 +79,13 @@ export default function ExtensionConnectPage() {
           localStorage.setItem('carbonwise_auth_data', JSON.stringify(extensionData));
           console.log('💾 Stored auth data in localStorage as backup');
         } catch (error) {
-          console.log('localStorage not available:', error.message);
+          console.log('localStorage not available:', error instanceof Error ? error.message : error);
         }
         
         setStatus('✅ Authentication complete! Extension should connect shortly...');
         
         // Listen for confirmation from extension
-        const handleConfirmation = (event) => {
+        const handleConfirmation = (event: MessageEvent) => {
           if (event.data.type === 'CARBONWISE_EXTENSION_AUTH_COMPLETE') {
             console.log('📬 Received confirmation from extension:', event.data);
             if (event.data.success) {

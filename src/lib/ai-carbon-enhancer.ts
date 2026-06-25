@@ -38,8 +38,8 @@ interface AIEnhancedResult {
 export class AIEnhancedCarbonCalculator {
   private openrouterClient: OpenAI;
   private climatiqApiKey: string;
-  private websiteEnergyDb: any[];
-  private deviceEnergyDb: any[];
+  private websiteEnergyDb: any[] = [];
+  private deviceEnergyDb: any[] = [];
 
   constructor() {
     this.openrouterClient = new OpenAI({
@@ -183,32 +183,56 @@ export class AIEnhancedCarbonCalculator {
     }
   }
 
-  // Get real-time emission factors from Climatiq API
+  // Get real-time grid-electricity emission factor (kg CO2e / kWh) from
+  // Climatiq's Search API for the user's country/region.
+  // Docs: https://www.climatiq.io/docs/api-reference/search
   private async getRealTimeEmissionFactors(country: string) {
+    const fallback = this.fallbackElectricityFactor(country);
+
     if (!this.climatiqApiKey) {
-      return { electricityFactor: 0.709, confidence: 0.3 }; // US average fallback
+      return { electricityFactor: fallback, confidence: 0.3 };
     }
 
     try {
-      const response = await fetch('https://api.climatiq.io/data/v1/emission-factors', {
+      const region = (country || 'US').toUpperCase();
+      const params = new URLSearchParams({
+        query: 'electricity supply grid',
+        region,
+        results_per_page: '1',
+        data_version: '^6',
+      });
+
+      const response = await fetch(`https://api.climatiq.io/data/v1/search?${params.toString()}`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${this.climatiqApiKey}`,
-          'Content-Type': 'application/json'
-        }
+        headers: { Authorization: `Bearer ${this.climatiqApiKey}` },
       });
 
       if (response.ok) {
         const data = await response.json();
-        // Extract electricity emission factor for the country
-        const electricityFactor = this.extractElectricityFactor(data, country);
-        return { electricityFactor, confidence: 0.9 };
+        const factor = data?.results?.[0]?.factor;
+        if (typeof factor === 'number' && factor > 0) {
+          return { electricityFactor: factor, confidence: 0.9 };
+        }
+        // API responded but had no usable grid factor for this region.
+        return { electricityFactor: fallback, confidence: 0.5 };
       }
+
+      console.error('Climatiq API error:', response.status, await response.text());
     } catch (error) {
-      console.error('Climatiq API failed:', error);
+      console.error('Climatiq API failed:', error instanceof Error ? error.message : error);
     }
 
-    return { electricityFactor: 0.709, confidence: 0.3 };
+    return { electricityFactor: fallback, confidence: 0.4 };
+  }
+
+  // Static per-country grid intensity (kg CO2e / kWh) used when Climatiq
+  // is unavailable or returns no match.
+  private fallbackElectricityFactor(country: string): number {
+    const countryFactors: { [key: string]: number } = {
+      US: 0.709, UK: 0.233, GB: 0.233, DE: 0.401, FR: 0.056,
+      CA: 0.13, AU: 0.81, IN: 0.708, CN: 0.555, JP: 0.474,
+    };
+    return countryFactors[(country || 'US').toUpperCase()] || 0.709;
   }
 
   // Generate AI insights and recommendations using DeepSeek V3

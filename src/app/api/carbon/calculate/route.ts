@@ -1,32 +1,14 @@
 import { NextResponse } from 'next/server';
 import { CarbonCalculator } from '@/lib/carbon-calculator';
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { resolveUserId } from '@/lib/extension-auth';
 
 export async function POST(request: Request) {
   try {
-    // Check authentication
-    let userId = null;
-    
-    const session = await getServerSession(authOptions);
-    if (session?.user?.id) {
-      userId = session.user.id;
-    } else {
-      // Try extension authentication
-      const authHeader = request.headers.get('authorization');
-      if (authHeader && authHeader.startsWith('Bearer ')) {
-        const token = authHeader.substring(7);
-        
-        // Simple token validation - extract userId from token
-        if (token.startsWith('ext_')) {
-          const parts = token.split('_');
-          if (parts.length >= 2) {
-            userId = parts[1];
-          }
-        }
-      }
-    }
-    
+    // Auth: web session OR cryptographically-verified extension token.
+    // (Previously this trusted an unsigned `ext_<userId>` string, which
+    // allowed trivial user impersonation.)
+    const userId = await resolveUserId(request);
+
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }

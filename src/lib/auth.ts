@@ -1,62 +1,61 @@
 import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
+// import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import GitHubProvider from "next-auth/providers/github"
-import bcrypt from "bcryptjs"
-import { prisma } from "./prisma"
+// import bcrypt from "bcryptjs"
+// import { prisma } from "./prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma) as any,
+  // Temporarily disable Prisma adapter until database is set up
+  // adapter: PrismaAdapter(prisma) as any,
   providers: [
-    // Email & Password Authentication
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Invalid credentials")
-        }
-
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
-        })
-
-        if (!user || !user.password) {
-          throw new Error("Invalid credentials")
-        }
-
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isPasswordValid) {
-          throw new Error("Invalid credentials")
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          role: user.role,
-        }
-      }
+    // Google OAuth
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
 
-    // Google OAuth (optional)
-    ...(process.env.GOOGLE_CLIENT_ID ? [
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      })
-    ] : []),
+    // Email & Password Authentication (temporarily disabled)
+    // CredentialsProvider({
+    //   name: "credentials",
+    //   credentials: {
+    //     email: { label: "Email", type: "email" },
+    //     password: { label: "Password", type: "password" }
+    //   },
+    //   async authorize(credentials) {
+    //     if (!credentials?.email || !credentials?.password) {
+    //       throw new Error("Invalid credentials")
+    //     }
+
+    //     const user = await prisma.user.findUnique({
+    //       where: {
+    //         email: credentials.email
+    //       }
+    //     })
+
+    //     if (!user || !user.password) {
+    //       throw new Error("Invalid credentials")
+    //     }
+
+    //     const isPasswordValid = await bcrypt.compare(
+    //       credentials.password,
+    //       user.password
+    //     )
+
+    //     if (!isPasswordValid) {
+    //       throw new Error("Invalid credentials")
+    //     }
+
+    //     return {
+    //       id: user.id,
+    //       email: user.email,
+    //       name: user.name,
+    //       image: user.image,
+    //       role: user.role,
+    //     }
+    //   }
+    // }),
 
     // GitHub OAuth (optional)
     ...(process.env.GITHUB_ID ? [
@@ -72,15 +71,21 @@ export const authOptions: NextAuthOptions = {
   },
   
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
         token.name = user.name
         token.email = user.email
         token.image = user.image
-        token.role = user.role
-        token.accountType = user.accountType
+        token.role = user.role || 'USER'
+        token.accountType = user.accountType || 'INDIVIDUAL'
       }
+      
+      // For Google OAuth, add the Google ID
+      if (account?.provider === 'google') {
+        token.googleId = account.providerAccountId
+      }
+      
       return token
     },
     
@@ -92,8 +97,17 @@ export const authOptions: NextAuthOptions = {
         session.user.image = token.image as string
         session.user.role = token.role as string
         session.user.accountType = token.accountType as string
+        session.user.googleId = token.googleId as string
       }
       return session
+    },
+    
+    async signIn({ user, account, profile }) {
+      // For now, allow all Google sign-ins
+      if (account?.provider === 'google') {
+        return true
+      }
+      return true
     },
     
     async redirect({ url, baseUrl }) {
@@ -106,7 +120,7 @@ export const authOptions: NextAuthOptions = {
   
   pages: {
     signIn: "/auth/signin",
-    signUp: "/auth/signup",
+    // signUp: "/auth/signup",
   },
   
   secret: process.env.NEXTAUTH_SECRET,

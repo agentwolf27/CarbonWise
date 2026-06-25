@@ -1,7 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { X, Leaf, Zap, Globe, Plane, ShoppingCart, Lightbulb } from 'lucide-react';
+
+interface AddActivityModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onActivityAdded: () => void;
+}
 
 const activityTypes = [
   { name: 'Cloud Computing', icon: Globe },
@@ -11,14 +17,14 @@ const activityTypes = [
   { name: 'Energy Usage', icon: Lightbulb },
 ];
 
-export default function AddActivityModal({ isOpen, onClose, onActivityAdded }) {
+export default function AddActivityModal({ isOpen, onClose, onActivityAdded }: AddActivityModalProps) {
   const [activityType, setActivityType] = useState(activityTypes[0].name);
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');

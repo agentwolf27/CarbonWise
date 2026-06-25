@@ -13,7 +13,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import type { ChartData } from '@/types/carbon';
+import type { ChartPoint } from '@/types/carbon';
 
 ChartJS.register(
   CategoryScale,
@@ -27,7 +27,7 @@ ChartJS.register(
 );
 
 interface CarbonChartProps {
-  data: ChartData;
+  data: ChartPoint[];
   isLoading?: boolean;
 }
 
@@ -35,11 +35,11 @@ export default function CarbonChart({ data, isLoading }: CarbonChartProps) {
   const chartRef = useRef<ChartJS<'line', number[], string>>(null);
 
   const chartData = {
-    labels: data.labels,
+    labels: data.map((point) => point.date),
     datasets: [
       {
         label: 'Daily Carbon Footprint (kg CO₂)',
-        data: data.data,
+        data: data.map((point) => point.emissions),
         borderColor: '#8cd279',
         backgroundColor: 'rgba(140, 210, 121, 0.1)',
         borderWidth: 3,

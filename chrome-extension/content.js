@@ -38,6 +38,16 @@ const siteConfigs = {
     carbonFactor: 0.006, // kg CO2 per message
     trackingType: 'messages'
   },
+  'deepseek.com': {
+    type: 'Digital',
+    selectors: {
+      messageInput: '[data-testid="chat-input"]',
+      messages: '.message',
+      conversation: '.chat-container'
+    },
+    carbonFactor: 0.005, // kg CO2 per message (slightly lower than Claude)
+    trackingType: 'messages'
+  },
   'youtube.com': {
     type: 'Digital',
     selectors: {
@@ -783,8 +793,8 @@ class CarbonTracker {
             const result = await chrome.storage.local.get(['carbonwise_token']);
             if (!result.carbonwise_token) return;
             
-            // Send to AI-enhanced API
-            const response = await fetch('http://localhost:3001/api/carbon/ai-enhanced', {
+                    // Send to AI-enhanced API
+        const response = await fetch('http://localhost:3000/api/carbon/ai-enhanced', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

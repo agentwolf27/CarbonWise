@@ -7,12 +7,14 @@ declare module "next-auth" {
       id: string
       role: string
       accountType: string
+      googleId?: string
     } & DefaultSession["user"]
   }
 
   interface User extends DefaultUser {
     role: string
     accountType: string
+    googleId?: string
   }
 }
 
@@ -21,5 +23,6 @@ declare module "next-auth/jwt" {
     id: string
     role: string
     accountType: string
+    googleId?: string
   }
 } 

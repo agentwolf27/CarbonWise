@@ -31,7 +31,9 @@ const CONFIG = {
     'chat.openai.com',
     'claude.ai',
     'youtube.com',
-    'netflix.com'
+    'netflix.com',
+    'gemini.google.com',
+    'deepseek.com'
   ],
   
   // Security settings
